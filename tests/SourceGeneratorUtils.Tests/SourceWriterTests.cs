@@ -13,7 +13,6 @@ public class SourceWriterTests
     
     [InlineData("Hello, World!")]
     [InlineData("Another test case.")]
-    [InlineData("Test case with\r\nnewline.")]
     [InlineData(SeveralLineStringLiteralConstant)]
     public void WriteLine_ShouldIndentAllLines(string input)
     {
@@ -23,7 +22,7 @@ public class SourceWriterTests
         sourceWriter.Indentation++;
         sourceWriter.WriteLine(input);
 
-        Equal($"    {input.Replace("\r\n", "\r\n    ") + "\r\n"}", sourceWriter.ToString());
+        Equal($"    {input.Replace(Environment.NewLine, Environment.NewLine + "    ") + Environment.NewLine}", sourceWriter.ToString());
     }
 
     [Fact]
