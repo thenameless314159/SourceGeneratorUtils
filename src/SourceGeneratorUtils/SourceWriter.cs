@@ -15,6 +15,13 @@ public sealed class SourceWriter
     private string? _cachedToString;
     private int _indentation;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SourceWriter"/> class.
+    /// </summary>
+    /// <param name="indentationChar">The character used for indentation</param>
+    /// <param name="charsPerIndentation">The number of characters used for indentation</param>
+    /// <param name="cacheToString">Whether the <see cref="ToString"/> result must be cached or not.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Indentation != whitespace or chars per indentation lower than 1.</exception>
     public SourceWriter(char indentationChar, int charsPerIndentation, bool cacheToString = true)
     {
         if (!char.IsWhiteSpace(indentationChar)) throw new ArgumentOutOfRangeException(nameof(indentationChar));
@@ -25,14 +32,32 @@ public sealed class SourceWriter
         CharsPerIndentation = charsPerIndentation;
     }
     
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SourceWriter"/> class with a default indentation of 4 spaces.
+    /// </summary>
+    /// <param name="cacheToString">Whether the <see cref="ToString"/> result must be cached or not.</param>
     public SourceWriter(bool cacheToString = true) : this(' ', 4, cacheToString)
     {
     }
 
+    /// <summary>
+    /// Gets the current length of the underlying <see cref="StringBuilder"/> instance.
+    /// </summary>
     public int Length => _sb.Length;
+
+    /// <summary>
+    /// Gets the character used for indentation.
+    /// </summary>
     public char IndentationChar { get; }
+
+    /// <summary>
+    /// Gets the number of <see cref="IndentationChar"/> characters used for indentation.
+    /// </summary>
     public int CharsPerIndentation { get; }
     
+    /// <summary>
+    /// Gets or sets the current indentation level.
+    /// </summary>
     public int Indentation
     {
         get => _indentation;

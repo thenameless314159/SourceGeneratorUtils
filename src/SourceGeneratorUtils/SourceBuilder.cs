@@ -13,8 +13,21 @@ public class SourceBuilder
     /// </summary>
     public IReadOnlyDictionary<FileInfo, SourceWriter> SourceFiles => _sourceFiles;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SourceBuilder"/> class with the given initial source files.
+    /// </summary>
+    /// <param name="sourceFiles">The initial source files.</param>
     public SourceBuilder(IDictionary<FileInfo, SourceWriter> sourceFiles) => _sourceFiles = new(sourceFiles, FileInfoEqualityComparer.Instance);
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SourceBuilder"/> class with the given initial capacity.
+    /// </summary>
+    /// <param name="capacity">The initial capacity for the underlying store.</param>
     public SourceBuilder(int capacity) => _sourceFiles = new(capacity, FileInfoEqualityComparer.Instance);
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SourceBuilder"/> class with default capacity.
+    /// </summary>
     public SourceBuilder() => _sourceFiles = new(FileInfoEqualityComparer.Instance);
 
     /// <summary>
