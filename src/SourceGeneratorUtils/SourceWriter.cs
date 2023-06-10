@@ -64,10 +64,7 @@ public sealed class SourceWriter
         set
         {
             if (value < 0)
-            {
-                Throw();
-                static void Throw() => throw new ArgumentOutOfRangeException(nameof(value));
-            }
+                throw new ArgumentOutOfRangeException(nameof(value));
 
             _indentation = value;
         }
@@ -78,22 +75,6 @@ public sealed class SourceWriter
     /// </summary>
     /// <returns>A self <see cref="SourceWriter"/> instance to chain calls.</returns>
     public SourceWriter OpenBlock() => WriteLine(OpenBrace);
-
-    /// <summary>
-    /// Writes an indented character followed by the default line terminator to the text stream.
-    /// </summary>
-    /// <param name="value">The character to append to the text stream.</param>
-    /// <returns>A self <see cref="SourceWriter"/> instance to chain calls.</returns>
-    public SourceWriter WriteLine(char value)
-    {
-        AddIndentation();
-
-        _sb.Append(value);
-        _sb.AppendLine();
-
-        Indentation++;
-        return this;
-    }
 
     /// <summary>
     /// Closes a code block by writing an indented close brace followed by the default line terminator to the text stream.
@@ -121,6 +102,22 @@ public sealed class SourceWriter
         while (Indentation > 0)
             CloseBlock();
 
+        return this;
+    }
+
+    /// <summary>
+    /// Writes an indented character followed by the default line terminator to the text stream.
+    /// </summary>
+    /// <param name="value">The character to append to the text stream.</param>
+    /// <returns>A self <see cref="SourceWriter"/> instance to chain calls.</returns>
+    public SourceWriter WriteLine(char value)
+    {
+        AddIndentation();
+
+        _sb.Append(value);
+        _sb.AppendLine();
+
+        Indentation++;
         return this;
     }
 
@@ -169,8 +166,10 @@ public sealed class SourceWriter
 
     /// <inheritdoc />
     public override string ToString() => _useCachedToString
-        ? _cachedToString ??= _sb.ToString()
+        ? GetCachedToString()
         : _sb.ToString();
+
+    private string GetCachedToString() => _cachedToString ??= _sb.ToString();
 
     private void AddIndentation() => _sb.Append(IndentationChar, CharsPerIndentation * _indentation);
 
