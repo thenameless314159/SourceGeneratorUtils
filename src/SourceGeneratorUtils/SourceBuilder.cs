@@ -1,8 +1,8 @@
 ﻿namespace SourceGeneratorUtils;
 
 /// <summary>
-/// A thin wrapper over <see cref="Dictionary{TKey, TValue}"/> that uses <see cref="FileInfoEqualityComparer"/> as comparer
-/// to store generated source files and export them to disk.
+/// A thin wrapper over a <see cref="Dictionary{TKey, TValue}"/> with <see cref="FileInfo"/> as key type and <see cref="SourceWriter"/> as value type
+/// that uses <see cref="FileInfoEqualityComparer"/> as key comparer to store generated source files and export them to disk.
 /// </summary>
 public class SourceBuilder
 {
