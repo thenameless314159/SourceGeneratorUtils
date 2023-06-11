@@ -7,6 +7,6 @@ public interface ITypeSpec
     string Namespace { get; }
     string? BaseTypeName { get; }
     string? Accessibility { get; }
+    IList<string> Attributes { get; }
     IList<ITypeSpec> ContainingTypes { get; }
-    IList<ITypeSpec> BaseTypesAndThis { get; }
 }
