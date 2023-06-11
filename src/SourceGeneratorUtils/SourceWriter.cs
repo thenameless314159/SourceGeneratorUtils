@@ -74,7 +74,12 @@ public sealed class SourceWriter
     /// Open a code block by writing an indented open brace followed by the default line terminator to the text stream.
     /// </summary>
     /// <returns>A self <see cref="SourceWriter"/> instance to chain calls.</returns>
-    public SourceWriter OpenBlock() => WriteLine(OpenBrace);
+    public SourceWriter OpenBlock()
+    {
+        WriteLine(OpenBrace);
+        Indentation++;
+        return this;
+    }
 
     /// <summary>
     /// Closes a code block by writing an indented close brace followed by the default line terminator to the text stream.
@@ -116,8 +121,6 @@ public sealed class SourceWriter
 
         _sb.Append(value);
         _sb.AppendLine();
-
-        Indentation++;
         return this;
     }
 
@@ -129,6 +132,12 @@ public sealed class SourceWriter
     /// <returns>A self <see cref="SourceWriter"/> instance to chain calls.</returns>
     public SourceWriter WriteLine(string text)
     {
+        if (_indentation == 0)
+        {
+            _sb.AppendLine(text);
+            return this;
+        }
+
         bool isFinalLine;
         ReadOnlySpan<char> remaining = text.AsSpan();
         do
@@ -158,6 +167,7 @@ public sealed class SourceWriter
     /// Gets the current text written to the stream as a <see cref="SourceText"/> representation.
     /// </summary>
     /// <returns>A self <see cref="SourceWriter"/> instance to chain calls.</returns>
+    /// <remarks>Require to import Microsoft.CodeAnalysis.CSharp in the target assembly.</remarks>
     public SourceText ToSourceText()
     {
         Debug.Assert(_indentation == 0);
