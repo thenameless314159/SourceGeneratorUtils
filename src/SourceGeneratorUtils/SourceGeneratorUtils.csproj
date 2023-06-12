@@ -8,12 +8,14 @@
     <AnalysisLevel>latest</AnalysisLevel>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <Description>.NET standard 2.0 utils and helpers to write source files for source generators or general purpose.</Description>
     <PackageTags>src-gen sourcegen sourcegenerator sourcegeneration codegen codegenerator codegeneration helpers abstractions utils</PackageTags>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
+
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.1" PrivateAssets="all">
