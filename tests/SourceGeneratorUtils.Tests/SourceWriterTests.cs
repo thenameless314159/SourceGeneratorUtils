@@ -14,7 +14,7 @@ public class SourceWriterTests
     [Fact] public void Indentation_Setter_ThrowsIfIndentationIsLessThanOne() 
         => Throws<ArgumentOutOfRangeException>(() => new SourceWriter { Indentation = -1 });
 
-    const string SeveralLineStringLiteralConstant = """
+    const string SeveralLinesStringLiteralConstant = """
         Test case with
         several
         newlines.
@@ -24,7 +24,7 @@ public class SourceWriterTests
     [Theory]
     [InlineData("Hello, World!")]
     [InlineData("Another test case.")]
-    [InlineData(SeveralLineStringLiteralConstant)]
+    [InlineData(SeveralLinesStringLiteralConstant)]
     public void WriteLine_ShouldIndentAllLines(string input)
     {
         var sourceWriter = new SourceWriter();

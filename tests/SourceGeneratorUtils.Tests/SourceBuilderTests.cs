@@ -15,6 +15,19 @@ public class SourceBuilderTests
         Equal(sourceFiles, builder.SourceFiles);
     }
 
+    [Fact]
+    public void Ctor_WithDescriptors_ShouldPopulateSourceFiles()
+    {
+        var sourceFiles = new SourceFileDescriptor[]
+        {
+            new("file1.cs", new SourceWriter()),
+            new("file2.g.cs", new SourceWriter())
+        };
+
+        var builder = new SourceBuilder(sourceFiles);
+        Equal(sourceFiles, builder.SourceFiles.Select(static kvp => new SourceFileDescriptor(kvp.Key, kvp.Value)));
+    }
+
     [Theory, InlineData(16), InlineData(128)]
     public void Ctor_WithCapacity_ShouldCreateDictionaryWithGivenCapacity(int capacity)
         => Equal(capacity, new SourceBuilder(capacity).InitialCapacity);
@@ -29,6 +42,18 @@ public class SourceBuilderTests
 
         True(sourceBuilder.SourceFiles.TryGetValue(file, out var content));
         Equal(fileContent, content);
+    }
+
+    [Fact]
+    public void Register_Descriptor_ShouldAddSingleFileToSourceFiles()
+    {
+        SourceFileDescriptor descriptor = new("file.g.cs", new SourceWriter());
+        var sourceBuilder = new SourceBuilder();
+
+        sourceBuilder.Register(in descriptor);
+
+        True(sourceBuilder.SourceFiles.TryGetValue(descriptor.Name, out var content));
+        Equal(descriptor.Content, content);
     }
 
     [Fact]
@@ -59,6 +84,36 @@ public class SourceBuilderTests
         sourceBuilder.Register(sourceFiles);
 
         Equal(sourceFiles.ToDictionary(static x => x.Key, static x => x.Value), sourceBuilder.SourceFiles);
+    }
+
+    [Fact]
+    public void Register_Descriptors_ShouldAddAllFilesToSourceFiles()
+    {
+        var sourceFiles = new List<SourceFileDescriptor>
+        {
+            new("file1.cs", new SourceWriter()),
+            new("file2.cs", new SourceWriter())
+        };
+
+        var sourceBuilder = new SourceBuilder();
+        sourceBuilder.Register(sourceFiles);
+
+        Equal(sourceFiles.ToDictionary(static x => x.Name, static x => x.Content), sourceBuilder.SourceFiles);
+    }
+
+    [Fact]
+    public void Register_DescriptorsArray_ShouldAddAllFilesToSourceFiles()
+    {
+        var sourceFiles = new SourceFileDescriptor[]
+        {
+            new("file1.cs", new SourceWriter()),
+            new("file2.cs", new SourceWriter())
+        };
+
+        var sourceBuilder = new SourceBuilder();
+        sourceBuilder.Register(sourceFiles);
+
+        Equal(sourceFiles.ToDictionary(static x => x.Name, static x => x.Content), sourceBuilder.SourceFiles);
     }
 
     private static readonly Dictionary<string, SourceWriter> _testSourceFiles = new()

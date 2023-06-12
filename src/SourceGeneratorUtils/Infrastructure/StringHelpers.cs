@@ -1,5 +1,8 @@
 ﻿namespace SourceGeneratorUtils;
 
+/// <summary>
+/// Provides helper and extension methods for <see cref="string"/>.
+/// </summary>
 public static class StringHelpers
 {
     /// <summary>
@@ -40,5 +43,30 @@ public static class StringHelpers
         array[0] = char.ToLowerInvariant(array[0]);
 
         return new string(array);
+    }
+
+    /// <summary>
+    /// Makes a using directive from the input string.
+    /// </summary>
+    /// <param name="input">The input string.</param>
+    /// <returns>A using directive from the input string.</returns>
+    public static string MakeUsingDirective(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            throw new ArgumentNullException(nameof(input));
+
+        input = input.TrimStart();
+        input = input.TrimEnd();
+
+        var startsWithUsing = input.StartsWith("using");
+        var endsWithSemiColon = input.EndsWith(";");
+
+        return startsWithUsing switch
+        {
+            false when !endsWithSemiColon => $"using {input};",
+            false => $"using {input}",
+
+            _ => endsWithSemiColon ? input : $"{input};"
+        };
     }
 }
