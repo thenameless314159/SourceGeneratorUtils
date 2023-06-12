@@ -14,7 +14,3 @@ jobs:
   build:
     name: .NET Build & Test PR
     uses: ./.github/workflows/build.yml
-
-  analyze:
-        name: SonarCloud Analysis
-        uses: ./.github/workflows/analysis.yml
