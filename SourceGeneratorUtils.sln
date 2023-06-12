@@ -4,12 +4,22 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{28536F49-FC7F-4032-AB69-D3D8E2B8FBE1}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{3303C2BB-75B0-41A0-B809-974B872E4B25}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorUtils", "src\SourceGeneratorUtils\SourceGeneratorUtils.csproj", "{D2E87CDE-760B-4010-AF45-EF59BC1BF965}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceGeneratorUtils.Tests", "tests\SourceGeneratorUtils.Tests\SourceGeneratorUtils.Tests.csproj", "{D42BCB8C-7058-4530-AED9-21481C439A39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorUtils.Tests", "tests\SourceGeneratorUtils.Tests\SourceGeneratorUtils.Tests.csproj", "{D42BCB8C-7058-4530-AED9-21481C439A39}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C7D19FEF-0EBA-46C9-9A4F-400E0C815945}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

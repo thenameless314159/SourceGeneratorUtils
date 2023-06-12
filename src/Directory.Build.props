@@ -1,0 +1,21 @@
+<Project>
+
+  <PropertyGroup>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <!-- VersionSuffix used for local builds -->
+    <VersionSuffix>dev</VersionSuffix>
+    <!-- VersionSuffix to be used for CI builds -->
+    <VersionSuffix Condition=" '$(ContinuousIntegrationBuild)' == 'true' And '$(BuildNumber)' != '' ">ci.$(BuildNumber)</VersionSuffix>
+    <IsPackable>true</IsPackable>
+    <DebugType>embedded</DebugType>
+    <RepositoryType>git</RepositoryType>
+    <Authors>thenameless314159</Authors>
+    <Copyright>Copyright © thenameless314159</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/thenameless314159/SourceGeneratorUtils</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/thenameless314159/SourceGeneratorUtils</PackageProjectUrl>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
+
+</Project>

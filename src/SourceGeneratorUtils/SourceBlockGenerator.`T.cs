@@ -6,8 +6,19 @@
 /// <typeparam name="TDescriptor">The type of <see cref="ITypeSpec"/> to generate a source block for.</typeparam>
 public abstract class SourceBlockGenerator<TDescriptor> : SourceBlockGenerator where TDescriptor : ITypeSpec
 {
+    /// <summary>
+    /// Generates the source block for the target <see cref="ITypeSpec"/> using the strongly-typed <see cref="TypedSourceWritingContext"/>.
+    /// </summary>
+    /// <param name="writer">The target source writer.</param>
+    /// <param name="context">The source writing context.</param>
     protected abstract void GenerateBlock(SourceWriter writer, in TypedSourceWritingContext context);
 
+    /// <summary>
+    /// Represents a strongly-typed <see cref="SourceWritingContext"/> for custom <see cref="ITypeSpec"/> descriptors.
+    /// </summary>
+    /// <param name="Descriptor">The target <see cref="ITypeSpec"/> to generate source for.</param>
+    /// <param name="Options">The <see cref="SourceFileGenOptions"/> used in this context.</param>
+    /// <param name="Descriptors">The types that are being generated in this context.</param>
     protected readonly record struct TypedSourceWritingContext(
         TDescriptor Descriptor, 
         SourceFileGenOptions Options, 

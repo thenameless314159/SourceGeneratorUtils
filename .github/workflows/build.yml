@@ -1,15 +1,22 @@
-# This workflow will build and test a .NET solution
-name: .NET Test
+name: Build
 
-on: [push, pull_request]
+on:
+  workflow_call:
+    inputs:
+      packNugetPackage:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    name: .NET Build & Test
 
     steps:
     - uses: actions/checkout@v3
-    - name: Setup .NET
+
+    - name: Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.0.x
@@ -17,8 +24,27 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
       
+    - name: Create build number
+      run: |
+        now=$(date +'%Y%m%d')
+        buildNumber=$now.$GITHUB_RUN_NUMBER
+        echo "BUILD_NUMBER=$buildNumber" >> $GITHUB_ENV
+        echo "$buildNumber"
+
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --configuration Release --no-restore -p:BuildNumber=$BUILD_NUMBER -p:SourceRevisionId=$GITHUB_SHA -p:ContinuousIntegrationBuild=true
       
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --configuration Release --no-restore --no-build --verbosity normal
+
+    - name: Pack
+      if : ${{ inputs.packNugetPackage }}
+      run: dotnet pack --configuration Release --output ./artifacts/ci --verbosity normal -p:BuildNumber=$BUILD_NUMBER -p:SourceRevisionId=$GITHUB_SHA -p:ContinuousIntegrationBuild=true
+
+    - name: Upload artifacts (packages)
+      if : ${{ inputs.packNugetPackage }}
+      uses: actions/upload-artifact@master
+      with:
+        name: nupkg
+        path: ./artifacts/**/*.nupkg
+        retention-days: 5

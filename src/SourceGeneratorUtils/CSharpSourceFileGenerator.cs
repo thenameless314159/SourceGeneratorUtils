@@ -28,6 +28,11 @@ public class CSharpSourceFileGenerator<TDescriptor> : ISourceFileGenerator<TDesc
     /// <param name="options">The <see cref="SourceFileGenOptions"/> to use.</param>
     public CSharpSourceFileGenerator(SourceFileGenOptions options) => _options = options;
 
+    /// <summary>
+    /// Gets the file name for the given target descriptor.
+    /// </summary>
+    /// <param name="target">The target <see cref="ITypeSpec"/>.</param>
+    /// <returns>The file name of the target <see cref="ITypeSpec"/>.</returns>
     protected virtual string GetFileName(in TDescriptor target) => $"{target.Name}.g.cs";
 
     /// <inheritdoc />

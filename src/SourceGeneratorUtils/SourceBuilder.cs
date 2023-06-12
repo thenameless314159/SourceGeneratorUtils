@@ -6,6 +6,9 @@
 /// </summary>
 public class SourceBuilder
 {
+    /// <summary>
+    /// The source files store.
+    /// </summary>
     protected internal readonly Dictionary<string, SourceWriter> _sourceFiles;
 
     /// <summary>

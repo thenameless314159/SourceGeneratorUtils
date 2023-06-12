@@ -1,5 +1,8 @@
 ﻿namespace SourceGeneratorUtils;
 
+/// <summary>
+/// Represents the options to use when generating a c# source file.
+/// </summary>
 public record SourceFileGenOptions
 {
     /// <summary>

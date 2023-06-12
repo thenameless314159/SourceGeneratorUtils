@@ -194,7 +194,7 @@ public sealed class SourceWriter
         ReadOnlySpan<char> next;
         ReadOnlySpan<char> rest;
 
-        int lineLength = remainingText.IndexOf(NewLine);
+        int lineLength = remainingText.IndexOf('\n');
         if (lineLength == -1)
         {
             lineLength = remainingText.Length;
