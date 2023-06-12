@@ -1,12 +1,20 @@
-﻿using SourceGeneratorUtils.Descriptors;
-
-namespace SourceGeneratorUtils.Tests;
+﻿namespace SourceGeneratorUtils.Tests;
 
 public class CSharpSourceFileGeneratorTests
 {
     private static readonly DefaultTypeSpec DefaultTypeSpec = new("Test", "class", "SourceGeneratorUtils.Tests");
     private static readonly SourceFileGenOptions Options = new();
-    
+
+    [Fact]
+    public void GenerateSource_ShouldReturnValidSourceFileDescriptor()
+    {
+        var generator = new CSharpSourceFileGenerator(Options);
+        var sourceFile = generator.GenerateSource(DefaultTypeSpec);
+
+        SourceFileDescriptor expected = new("Test.g.cs", sourceFile.Content);
+        Equal(expected, sourceFile);
+    }
+
     [Fact]
     public void GenerateSource_ShouldUseWriterFactoryIfSpecified()
     {
@@ -15,7 +23,7 @@ public class CSharpSourceFileGeneratorTests
         {
             WriterFactory = static () => new SourceWriter().WriteLine(expected)
         });
-
+        
         var sourceFile = generator.GenerateSource(DefaultTypeSpec);
         StartsWith(expected, sourceFile.Content.ToString());
     }
@@ -210,7 +218,7 @@ public class CSharpSourceFileGeneratorTests
     }
 
     [Fact]
-    public void GenerateSource_ShouldFormatBaseTypeAndInterfacesTogether()
+    public void GenerateSource_ShouldJoinBaseTypeAndInterfacesTogether()
     {
         const string expected = """
                 public class Test : TestBase, ITest, IReadable

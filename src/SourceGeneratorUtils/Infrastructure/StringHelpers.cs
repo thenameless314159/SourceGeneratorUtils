@@ -1,5 +1,8 @@
 ﻿namespace SourceGeneratorUtils;
 
+/// <summary>
+/// Provides helper and extension methods for <see cref="string"/>.
+/// </summary>
 public static class StringHelpers
 {
     /// <summary>

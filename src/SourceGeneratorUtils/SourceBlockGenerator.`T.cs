@@ -1,5 +1,9 @@
 ﻿namespace SourceGeneratorUtils;
 
+/// <summary>
+/// Represents a strongly-typed <see cref="SourceBlockGenerator"/> for custom <see cref="ITypeSpec"/> descriptors.
+/// </summary>
+/// <typeparam name="TDescriptor">The type of <see cref="ITypeSpec"/> to generate a source block for.</typeparam>
 public abstract class SourceBlockGenerator<TDescriptor> : SourceBlockGenerator where TDescriptor : ITypeSpec
 {
     protected abstract void GenerateBlock(SourceWriter writer, in TypedSourceWritingContext context);

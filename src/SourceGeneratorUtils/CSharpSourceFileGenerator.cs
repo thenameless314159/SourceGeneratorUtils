@@ -1,19 +1,34 @@
-﻿using SourceGeneratorUtils.Descriptors;
+﻿namespace SourceGeneratorUtils;
 
-namespace SourceGeneratorUtils;
-
-public sealed class CSharpSourceFileGenerator : CSharpSourceFileGenerator<DefaultTypeSpec>
+/// <summary>
+/// Represents a C# source file generator using <see cref="ITypeSpec"/> as target descriptor.
+/// </summary>
+public class CSharpSourceFileGenerator : CSharpSourceFileGenerator<ITypeSpec>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CSharpSourceFileGenerator"/> class.
+    /// </summary>
+    /// <param name="options">The <see cref="SourceFileGenOptions"/> to use.</param>
     public CSharpSourceFileGenerator(SourceFileGenOptions options) : base(options)
     {
     }
 }
 
+/// <summary>
+/// Represents a C# source file generator for the given <see cref="ITypeSpec"/> implementation.
+/// </summary>
+/// <typeparam name="TDescriptor">he type of the target descriptor to generate a source file for.</typeparam>
 public class CSharpSourceFileGenerator<TDescriptor> : ISourceFileGenerator<TDescriptor> where TDescriptor : ITypeSpec
 {
     private readonly SourceFileGenOptions _options;
 
+    /// <summary>
+    /// Initializes a new instance of the strongly-typed <see cref="CSharpSourceFileGenerator{T}"/> class.
+    /// </summary>
+    /// <param name="options">The <see cref="SourceFileGenOptions"/> to use.</param>
     public CSharpSourceFileGenerator(SourceFileGenOptions options) => _options = options;
+
+    protected virtual string GetFileName(in TDescriptor target) => $"{target.Name}.g.cs";
 
     /// <inheritdoc />
     public SourceFileDescriptor GenerateSource(in TDescriptor target, IReadOnlyDictionary<string, TDescriptor>? descriptors = null)
@@ -29,7 +44,7 @@ public class CSharpSourceFileGenerator<TDescriptor> : ISourceFileGenerator<TDesc
         writer.WriteLine();
 
         // Using directives declaration
-        var namespacesToImport = _options.BlockGenerators // TODO: Except contained namespaces
+        var namespacesToImport = _options.BlockGenerators
             .SelectMany(c => c.GetImportedNamespaces(context))
             .Concat(_options.DefaultUsingDirectives)
             .Distinct()
@@ -50,8 +65,7 @@ public class CSharpSourceFileGenerator<TDescriptor> : ISourceFileGenerator<TDesc
                 .OpenBlock();
 
         // Containing types declaration
-        if (target.ContainingTypes.Count > 0) 
-            // TODO: handle base type, attributes and interfaces for containing types
+        if (target.ContainingTypes.Count > 0)
             foreach (var type in target.ContainingTypes)
             {
                 writer.WriteLine($"{type.Accessibility ?? publicKeyword} {type.Type} {type.Name}");
@@ -99,7 +113,7 @@ public class CSharpSourceFileGenerator<TDescriptor> : ISourceFileGenerator<TDesc
             writer.WriteLine(); // otherwise add a space between blocks
         }
 
-        return new SourceFileDescriptor(target.Name, writer.CloseAllBlocks());
+        return new SourceFileDescriptor(GetFileName(in target), writer.CloseAllBlocks());
         static string GetEnabledString(bool enabled) => enabled ? enable : disable;
         static string GetSeparatorOrEmpty(bool hasBaseTypeAndInterface) => hasBaseTypeAndInterface ? commaSeparator : string.Empty;
     }

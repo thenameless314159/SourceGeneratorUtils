@@ -1,6 +1,4 @@
-﻿using SourceGeneratorUtils.Descriptors;
-
-namespace SourceGeneratorUtils.Tests;
+﻿namespace SourceGeneratorUtils.Tests;
 
 public class SourceBlockGeneratorTests
 {

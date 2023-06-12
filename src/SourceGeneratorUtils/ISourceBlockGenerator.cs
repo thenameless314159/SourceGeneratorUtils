@@ -1,7 +1,7 @@
 ﻿namespace SourceGeneratorUtils;
 
 /// <summary>
-/// Generates a source block for the given context.
+/// Generates a source block in the body of the given <see cref="ITypeSpec"/> target.
 /// </summary>
 public interface ISourceBlockGenerator
 {

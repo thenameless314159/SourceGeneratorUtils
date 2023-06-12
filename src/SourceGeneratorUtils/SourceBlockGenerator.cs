@@ -1,5 +1,8 @@
 ﻿namespace SourceGeneratorUtils;
 
+/// <summary>
+/// Default abstraction for <see cref="ISourceBlockGenerator"/>.
+/// </summary>
 public abstract class SourceBlockGenerator : ISourceBlockGenerator
 {
     /// <inheritdoc />

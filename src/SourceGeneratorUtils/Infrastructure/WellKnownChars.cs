@@ -1,5 +1,8 @@
 ﻿namespace SourceGeneratorUtils;
 
+/// <summary>
+/// Well known characters.
+/// </summary>
 public static class WellKnownChars
 {
     public const char OpenBracket = '[', CloseBracket = ']';
