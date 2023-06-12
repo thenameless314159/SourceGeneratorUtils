@@ -37,7 +37,7 @@ jobs:
         uses: actions/setup-dotnet@v3
 
       - name: Push to GitHub Packages
-        run: dotnet nuget push **/ci/*.nupkg -s https://nuget.pkg.github.com/thenameless314159/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+        run: dotnet nuget push **/ci/*.nupkg -s https://nuget.pkg.github.com/thenameless314159/index.json --api-key ${{ secrets.TEMP_PAT }} --skip-duplicate
 
       - name: Delete old packages
         uses: smartsquaregmbh/delete-old-packages@v0.7.0
