@@ -164,7 +164,7 @@ public class SourceBuilder
         }
     }
 
-    private static void WriteToDisk(in KeyValuePair<string, SourceWriter> kvp, DirectoryInfo? directory = null)
+    internal static void WriteToDisk(in KeyValuePair<string, SourceWriter> kvp, DirectoryInfo? directory = null)
     {
         var file = directory != null 
             ? new FileInfo(Path.Combine(directory.FullName, kvp.Key)) 

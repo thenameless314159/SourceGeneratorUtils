@@ -163,4 +163,13 @@ public class SourceBuilderTests
 
         directory.Delete(true);
     }
+
+    [Fact]
+    public void WriteToDisk_WithNullDirectory_ShouldWriteToCurrentDire()
+    {
+        var kvp = _testSourceFiles.First();
+        SourceBuilder.WriteToDisk(in kvp, null);
+        True(File.Exists(kvp.Key));
+        File.Delete(kvp.Key);
+    }
 }
