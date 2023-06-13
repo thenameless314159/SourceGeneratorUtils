@@ -27,19 +27,11 @@ public class SourceBuilderExtensionsTests
         var builder = new SourceBuilder();
 
         builder.PopulateWith(srcFileGenerator, _descriptors, null);
-        foreach (var desc in _descriptors)
-        {
-            True(builder.SourceFiles.TryGetValue(desc.Name, out var generatedFile));
-            Equal("Hello There!" + Environment.NewLine, generatedFile.ToString());
-        }
+        VerifySourceBuilder(builder);
 
         builder = new SourceBuilder();
         builder.PopulateWith(srcFileGenerator, _descriptors.ToList(), null);
-        foreach (var desc in _descriptors)
-        {
-            True(builder.SourceFiles.TryGetValue(desc.Name, out var generatedFile));
-            Equal("Hello There!" + Environment.NewLine, generatedFile.ToString());
-        }
+        VerifySourceBuilder(builder);
     }
 
     [Theory, InlineData(true), InlineData(false)]
@@ -49,6 +41,11 @@ public class SourceBuilderExtensionsTests
         var builder = new SourceBuilder();
 
         builder.PopulateWith(srcFileGenerator, _descriptors, makeRelativesDict);
+        VerifySourceBuilder(builder);
+    }
+
+    private static void VerifySourceBuilder(SourceBuilder builder)
+    {
         foreach (var desc in _descriptors)
         {
             True(builder.SourceFiles.TryGetValue(desc.Name, out var generatedFile));
