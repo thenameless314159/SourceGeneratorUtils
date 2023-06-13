@@ -6,6 +6,7 @@
     <VersionSuffix>dev</VersionSuffix>
     <!-- VersionSuffix to be used for CI builds -->
     <VersionSuffix Condition=" '$(ContinuousIntegrationBuild)' == 'true' And '$(BuildNumber)' != '' ">ci.$(BuildNumber)</VersionSuffix>
+    <VersionSuffix Condition=" '$(ContinuousIntegrationBuild)' == 'true' And '$(IsNugetPackage)' == 'true' "></VersionSuffix>
     <IsPackable>true</IsPackable>
     <DebugType>embedded</DebugType>
     <RepositoryType>git</RepositoryType>

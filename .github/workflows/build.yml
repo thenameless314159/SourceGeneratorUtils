@@ -37,12 +37,14 @@ jobs:
     - name: Test
       run: dotnet test --configuration Release --no-restore --no-build --verbosity normal
 
-    - name: Pack
-      if : ${{ inputs.packNugetPackage }}
+    - name: Pack (ci)
       run: dotnet pack --configuration Release --output ./artifacts/ci --verbosity normal -p:BuildNumber=$BUILD_NUMBER -p:SourceRevisionId=$GITHUB_SHA -p:ContinuousIntegrationBuild=true
 
+    - name: Pack (nuget)
+      if: ${{ inputs.packNugetPackage }}
+      run: dotnet pack --configuration Release --output ./artifacts/ship --verbosity normal -p:BuildNumber=$BUILD_NUMBER -p:SourceRevisionId=$GITHUB_SHA -p:ContinuousIntegrationBuild=true -p:IsNugetPackage=true
+
     - name: Upload artifacts (packages)
-      if : ${{ inputs.packNugetPackage }}
       uses: actions/upload-artifact@master
       with:
         name: nupkg
