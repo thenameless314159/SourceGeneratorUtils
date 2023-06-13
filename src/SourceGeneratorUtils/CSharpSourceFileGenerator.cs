@@ -36,11 +36,11 @@ public class CSharpSourceFileGenerator<TDescriptor> : ISourceFileGenerator<TDesc
     protected virtual string GetFileName(in TDescriptor target) => $"{target.Name}.g.cs";
 
     /// <inheritdoc />
-    public SourceFileDescriptor GenerateSource(in TDescriptor target, IReadOnlyDictionary<string, TDescriptor>? descriptors = null)
+    public SourceFileDescriptor GenerateSource(in TDescriptor target, IReadOnlyDictionary<string, TDescriptor>? relatives = null)
     {
         const string publicKeyword = "public", commaSeparator = ", ", enable = "enable", disable = "disable";
 
-        var context = SourceWritingContext.CreateFor(target, _options, descriptors);
+        var context = SourceWritingContext.CreateFor(target, _options, relatives);
         var writer = _options.WriterFactory?.Invoke() ?? new SourceWriter();
 
         // Nullable annotations and warnings declaration on top of the file
