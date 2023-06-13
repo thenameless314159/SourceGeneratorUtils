@@ -140,6 +140,7 @@ public class SourceBuilderTests
         var file2Content = File.ReadAllText(Path.Combine(directory.FullName, file2));
         Equal(_testSourceFiles[file2].ToString(), file2Content);
 
+        directory.Refresh();
         directory.Delete(true);
     }
 
@@ -161,6 +162,7 @@ public class SourceBuilderTests
         var file2Content = await File.ReadAllTextAsync(Path.Combine(directory.FullName, file2));
         Equal(_testSourceFiles[file2].ToString(), file2Content);
 
+        directory.Refresh();
         directory.Delete(true);
     }
 
@@ -171,5 +173,19 @@ public class SourceBuilderTests
         SourceBuilder.WriteToDisk(in kvp, null);
         True(File.Exists(kvp.Key));
         File.Delete(kvp.Key);
+    }
+
+    [Fact]
+    public void WriteToDisk_ShouldCreateDirectory()
+    {
+        var kvp = _testSourceFiles.First();
+        var directory = new DirectoryInfo("testDir");
+
+        False(directory.Exists);
+        SourceBuilder.WriteToDisk(in kvp, directory);
+
+        directory.Refresh();
+        True(directory.Exists);
+        directory.Delete(true);
     }
 }
