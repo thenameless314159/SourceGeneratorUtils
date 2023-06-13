@@ -17,6 +17,18 @@ public class SourceBuilder
     public IReadOnlyDictionary<string, SourceWriter> SourceFiles => _sourceFiles;
 
     /// <summary>
+    /// Gets the generated source files as <see cref="SourceFileDescriptor"/>.
+    /// </summary>
+    public IEnumerable<SourceFileDescriptor> SourceFileDescriptors
+    {
+        get
+        {
+            foreach (KeyValuePair<string, SourceWriter> kvp in _sourceFiles)
+                yield return new SourceFileDescriptor(kvp.Key, kvp.Value);
+        }
+    }
+
+    /// <summary>
     /// Gets the initial capacity of the underlying store.
     /// Returns 0 if no initial capacity was specified.
     /// </summary>

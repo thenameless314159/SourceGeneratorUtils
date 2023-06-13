@@ -25,7 +25,7 @@ public class SourceBuilderTests
         };
 
         var builder = new SourceBuilder(sourceFiles);
-        Equal(sourceFiles, builder.SourceFiles.Select(static kvp => new SourceFileDescriptor(kvp.Key, kvp.Value)));
+        Equal(sourceFiles, builder.SourceFileDescriptors);
     }
 
     [Theory, InlineData(16), InlineData(128)]
