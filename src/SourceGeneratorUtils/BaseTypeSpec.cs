@@ -16,7 +16,4 @@ public abstract record BaseTypeSpec
 
     /// <inheritdoc/>
     public IList<ITypeSpec> ContainingTypes { get; init; } = Array.Empty<ITypeSpec>();
-
-    /// <inheritdoc/>
-    public override string ToString() => Name;
 }

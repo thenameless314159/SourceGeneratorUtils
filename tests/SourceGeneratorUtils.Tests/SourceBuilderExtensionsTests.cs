@@ -32,6 +32,14 @@ public class SourceBuilderExtensionsTests
             True(builder.SourceFiles.TryGetValue(desc.Name, out var generatedFile));
             Equal("Hello There!" + Environment.NewLine, generatedFile.ToString());
         }
+
+        builder = new SourceBuilder();
+        builder.PopulateWith(srcFileGenerator, _descriptors.ToList(), null);
+        foreach (var desc in _descriptors)
+        {
+            True(builder.SourceFiles.TryGetValue(desc.Name, out var generatedFile));
+            Equal("Hello There!" + Environment.NewLine, generatedFile.ToString());
+        }
     }
 
     [Theory, InlineData(true), InlineData(false)]
