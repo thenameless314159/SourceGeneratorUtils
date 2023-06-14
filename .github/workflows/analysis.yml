@@ -9,6 +9,10 @@ on:
       - "**/*.gitattributes"
   pull_request:
     types: [opened, synchronize, reopened]
+    paths-ignore:
+      - "**/*.md"
+      - "**/*.gitignore"
+      - "**/*.gitattributes"
     
 jobs:
   build:
