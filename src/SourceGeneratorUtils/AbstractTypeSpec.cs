@@ -8,12 +8,12 @@
 /// <param name="Namespace">The namespace of the type.</param>
 /// <param name="BaseTypeName">The name of the base type if any.</param>
 /// <param name="Accessibility">The accessibility of the type if any. Can be "public", "internal", etc.</param>
-public abstract record BaseTypeSpec
+public abstract record AbstractTypeSpec
     (string Name, string Type, string Namespace, string? BaseTypeName = null, string? Accessibility = null) : ITypeSpec
 {
     /// <inheritdoc/>
-    public IList<string> Attributes { get; init; } = Array.Empty<string>();
+    public IReadOnlyList<string> Attributes { get; init; } = Array.Empty<string>();
 
     /// <inheritdoc/>
-    public IList<ITypeSpec> ContainingTypes { get; init; } = Array.Empty<ITypeSpec>();
+    public IReadOnlyList<ITypeSpec> ContainingTypes { get; init; } = Array.Empty<ITypeSpec>();
 }

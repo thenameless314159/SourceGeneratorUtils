@@ -21,26 +21,16 @@ public class SourceBuilderExtensionsTests
     }
 
     [Fact]
-    public void PopulateWith_Relatives_ShouldPopulateSourceBuilder_WithGeneratedSourceFiles()
+    public void PopulateWith_ShouldPopulateSourceBuilder_WithGeneratedSourceFiles()
     {
         var srcFileGenerator = new TestSourceFileGenerator();
         var builder = new SourceBuilder();
 
-        builder.PopulateWith(srcFileGenerator, _descriptors, null);
+        builder.PopulateWith(srcFileGenerator, _descriptors);
         VerifySourceBuilder(builder);
 
         builder = new SourceBuilder();
-        builder.PopulateWith(srcFileGenerator, _descriptors.ToList(), null);
-        VerifySourceBuilder(builder);
-    }
-
-    [Theory, InlineData(true), InlineData(false)]
-    public void PopulateWith_NoRelatives_ShouldPopulateSourceBuilder_WithGeneratedSourceFiles(bool makeRelativesDict)
-    {
-        var srcFileGenerator = new TestSourceFileGenerator { RelativesExpected = makeRelativesDict };
-        var builder = new SourceBuilder();
-
-        builder.PopulateWith(srcFileGenerator, _descriptors, makeRelativesDict);
+        builder.PopulateWith(srcFileGenerator, _descriptors.ToList());
         VerifySourceBuilder(builder);
     }
 
@@ -55,12 +45,8 @@ public class SourceBuilderExtensionsTests
 
     private class TestSourceFileGenerator : ISourceFileGenerator<DefaultTypeSpec>
     {
-        public bool RelativesExpected { get; set; }
-
-        public SourceFileDescriptor GenerateSource(in DefaultTypeSpec target,
-            IReadOnlyDictionary<string, DefaultTypeSpec>? relatives = null)
+        public SourceFileDescriptor GenerateSource(DefaultTypeSpec target)
         {
-            True(!RelativesExpected || relatives != null);
             return new(target.Name, new SourceWriter().WriteLine("Hello There!"));
         }
     }

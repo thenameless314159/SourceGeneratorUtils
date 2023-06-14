@@ -10,4 +10,4 @@
 /// <param name="Accessibility">The accessibility of the type if any. Can be "public", "internal", etc.</param>
 public sealed record DefaultTypeSpec
     (string Name, string Type, string Namespace, string? BaseTypeName = null, string? Accessibility = null) 
-    : BaseTypeSpec(Name, Type, Namespace, BaseTypeName, Accessibility);
+    : AbstractTypeSpec(Name, Type, Namespace, BaseTypeName, Accessibility);

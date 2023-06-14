@@ -148,7 +148,7 @@ public class SourceBuilder
     /// <returns>The <see cref="ValueTask"/>.</returns>
     public ValueTask ExportToAsync(DirectoryInfo directory)
     {
-        _ = Parallel.ForEach(_sourceFiles, kvp => WriteToDisk(in kvp, directory));
+        _ = Parallel.ForEach(_sourceFiles, kvp => kvp.WriteToDisk(directory));
         return default;
     }
 
@@ -160,17 +160,7 @@ public class SourceBuilder
     {
         foreach (KeyValuePair<string, SourceWriter> kvp in _sourceFiles)
         {
-            WriteToDisk(in kvp, directory);
+            kvp.WriteToDisk(directory);
         }
-    }
-
-    internal static void WriteToDisk(in KeyValuePair<string, SourceWriter> kvp, DirectoryInfo? directory = null)
-    {
-        var file = directory != null 
-            ? new FileInfo(Path.Combine(directory.FullName, kvp.Key)) 
-            : new FileInfo(kvp.Key);
-
-        file.Directory?.Create();
-        File.WriteAllText(file.FullName, kvp.Value.ToString());
     }
 }

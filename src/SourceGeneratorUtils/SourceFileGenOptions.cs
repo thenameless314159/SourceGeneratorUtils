@@ -1,10 +1,15 @@
 ﻿namespace SourceGeneratorUtils;
 
 /// <summary>
-/// Represents the options to use when generating a c# source file.
+/// Represents the options to use when generating a C# source file using <see cref="CSharpSourceGenerator{TDescriptor}"/>.
 /// </summary>
 public record SourceFileGenOptions
 {
+    /// <summary>
+    /// The default <see cref="SourceFileGenOptions"/> instance.
+    /// </summary>
+    public static readonly SourceFileGenOptions Default = new();
+
     /// <summary>
     /// Whether to use combined attributes. If true, attributes will be combined into one attribute
     /// and will looks like this: <code>[Attribute1, Attribute2, Attribute3]</code>.
@@ -54,9 +59,4 @@ public record SourceFileGenOptions
     /// The default using directives that will be added to the top of the file.
     /// </summary>
     public IReadOnlyList<string> DefaultUsingDirectives { get; init; } = Array.Empty<string>();
-
-    /// <summary>
-    /// The block generators that will be used to generate the target <see cref="ITypeSpec"/> body.
-    /// </summary>
-    public IReadOnlyList<ISourceBlockGenerator> BlockGenerators { get; init; } = Array.Empty<ISourceBlockGenerator>();
 }
