@@ -1,7 +1,8 @@
 ﻿namespace SourceGeneratorUtils;
 
 /// <summary>
-/// Represents a type specification.
+/// Represents a type specification used by <see cref="CSharpSourceGenerator{TDescriptor}"/>
+/// to describe the target type to generate sources for.
 /// </summary>
 public interface ITypeSpec
 {
@@ -12,7 +13,6 @@ public interface ITypeSpec
 
     /// <summary>
     /// Gets the type of the type. Can be "class", "struct", "record", etc.
-    /// Can also be "partial class" etc.
     /// </summary>
     string Type { get; }
 
@@ -34,10 +34,10 @@ public interface ITypeSpec
     /// <summary>
     /// Gets the attributes of the type.
     /// </summary>
-    IList<string> Attributes { get; }
+    IReadOnlyList<string> Attributes { get; }
 
     /// <summary>
     /// Gets the types that contain this type.
     /// </summary>
-    IList<ITypeSpec> ContainingTypes { get; }
+    IReadOnlyList<ITypeSpec> ContainingTypes { get; }
 }
