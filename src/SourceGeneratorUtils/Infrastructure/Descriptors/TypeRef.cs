@@ -98,8 +98,7 @@ public sealed class TypeRef : ITypeDescriptor, IEquatable<TypeRef>
     public bool Equals(TypeRef? other) => other != null && FullyQualifiedName == other.FullyQualifiedName;
 
     /// <inheritdoc/>
-    public bool Equals(ITypeDescriptor? other) => (other is TypeRef typeRef && Equals(typeRef)) 
-        || other is not null && FullyQualifiedName == other.FullyQualifiedName;
+    public bool Equals(ITypeDescriptor? other) => other != null && FullyQualifiedName == other.FullyQualifiedName;
 
     /// <inheritdoc/>
     public override bool Equals(object? obj) => Equals(obj as TypeRef);

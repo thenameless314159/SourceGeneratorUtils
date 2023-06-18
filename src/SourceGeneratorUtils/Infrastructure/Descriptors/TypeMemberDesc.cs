@@ -19,7 +19,7 @@ namespace SourceGeneratorUtils;
 /// As an immutable record, this type should encapsulate most logic to handle comparison between members therefore
 /// it should be safe to add new members to this type without risking to break incremental caching in your source generator.
 /// (considering that this record as a base would cover most common cases for most member definition changes and that
-/// new members are readonly properties)
+/// new members would be readonly properties)
 /// </remarks>
 public record TypeMemberDesc
 {
@@ -41,12 +41,12 @@ public record TypeMemberDesc
     public string? MemberVarName { get; init; }
 
     /// <summary>
-    /// Gets or init a reference to the member type ref.
+    /// Gets or init a reference to the member type.
     /// </summary>
     public required ITypeDescriptor MemberType { get; init; }
 
     /// <summary>
-    /// Gets or init a reference to the declaring type ref of the property.
+    /// Gets or init a reference to the declaring type of the property.
     /// </summary>
     public required ITypeDescriptor DeclaringType { get; init; }
 
