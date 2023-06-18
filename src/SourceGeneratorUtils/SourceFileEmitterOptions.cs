@@ -18,13 +18,6 @@ public record SourceFileEmitterOptions
     public string? SourceFileHeader { get; init; }
 
     /// <summary>
-    /// Specifies the assembly name of the source file emitter. This will be used to add the
-    /// <see cref="System.CodeDom.Compiler.GeneratedCodeAttribute"/> to the emitted source file target.
-    /// To disable the addition of the attribute, set this property to null.
-    /// </summary>
-    public AssemblyName? AssemblyName { get; init; }
-
-    /// <summary>
     /// Determines whether to use nullable reference type annotations.
     /// If set to true, the nullable reference types feature will be enabled, otherwise disabled.
     /// </summary>

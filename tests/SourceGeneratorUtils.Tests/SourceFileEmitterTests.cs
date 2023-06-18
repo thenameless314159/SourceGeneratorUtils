@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using System.Text;
+﻿using System.Text;
 
 namespace SourceGeneratorUtils.Tests;
 
@@ -11,6 +10,42 @@ public class SourceFileEmitterTests
         new TestSourceCodeEmitter(),
         new SourceCodeEmitterWithUsingDirectives()
     };
+    
+    [Fact]
+    public void TestSourceCodeEmitter_Options_GetShouldThrowIfNotSetup()
+        => Throws<InvalidOperationException>(() => new TestSourceCodeEmitter().Options);
+
+    [Fact]
+    public void GetTargetOuterUsingDirectives_ReturnsAllSourceCodeWritersOuterUsingDirectives()
+    {
+        var sourceCodeEmitters = new[]
+        {
+            new SourceCodeEmitterWithUsingDirectives { OuterUsingDirectives = new [] { "SourceGeneratorUtils"}},
+            new SourceCodeEmitterWithUsingDirectives { OuterUsingDirectives =new [] { "System"}},
+            new SourceCodeEmitterWithUsingDirectives { OuterUsingDirectives =new [] { "System.Buffers"}},
+        };
+
+        var emitter = new TestSourceFileEmitter { SourceCodeEmitters = sourceCodeEmitters };
+
+        var expected = sourceCodeEmitters.SelectMany(e => e.OuterUsingDirectives);
+        Equal(expected, emitter.GetTargetOuterUsingDirectives(DefaultSpec));
+    }
+
+    [Fact]
+    public void GetTargetInnerUsingDirectives_ReturnsAllSourceCodeWritersOuterUsingDirectives()
+    {
+        var sourceCodeEmitters = new[]
+        {
+            new SourceCodeEmitterWithUsingDirectives { InnerUsingDirectives = new [] { "SourceGeneratorUtils"}},
+            new SourceCodeEmitterWithUsingDirectives { InnerUsingDirectives =new [] { "System"}},
+            new SourceCodeEmitterWithUsingDirectives { InnerUsingDirectives =new [] { "System.Buffers"}},
+        };
+
+        var emitter = new TestSourceFileEmitter { SourceCodeEmitters = sourceCodeEmitters };
+
+        var expected = sourceCodeEmitters.SelectMany(e => e.InnerUsingDirectives);
+        Equal(expected, emitter.GetTargetInnerUsingDirectives(DefaultSpec));
+    }
 
     [Theory, InlineData(true), InlineData(false)]
     public void GenerateSource_ShouldSetupOptionsOnSourceCodeWritersIfNone(bool optionAlreadySetup)
@@ -20,10 +55,14 @@ public class SourceFileEmitterTests
             : new[] { new TestSourceCodeEmitter() };
 
         var emitter = new TestSourceFileEmitter { SourceCodeEmitters = sourceCodeEmitters };
+
+        False(emitter._areOptionsSetup);
         _ = emitter.GenerateSource(DefaultSpec);
 
         if (optionAlreadySetup) NotEqual(SourceFileEmitterOptions.Default, sourceCodeEmitters[0].Options);
         else Equal(SourceFileEmitterOptions.Default, sourceCodeEmitters[0].Options);
+
+        True(emitter._areOptionsSetup);
     }
 
     [Theory, InlineData(-1), InlineData(0), InlineData(1), InlineData(2), InlineData(16)]

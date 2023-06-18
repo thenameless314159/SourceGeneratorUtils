@@ -8,6 +8,8 @@ namespace SourceGeneratorUtils;
 /// <typeparam name="TSpec">The target specification type to emit source files for.</typeparam>
 public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> where TSpec : AbstractGenerationSpec
 {
+    internal bool _areOptionsSetup; // internal for testing purposes
+
     /// <inheritdoc/>
     protected SourceFileEmitter(SourceFileEmitterOptions options) : base(options)
     {
@@ -42,16 +44,20 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
     }
 
     /// <inheritdoc/>
-    protected override IEnumerable<string> GetTargetOuterUsingDirectives(TSpec target) => GetSourceCodeEmitters().SelectMany(e =>
+    protected internal override IEnumerable<string> GetTargetOuterUsingDirectives(TSpec target) => GetSourceCodeEmitters().SelectMany(e =>
     {
         // Setup the options here since this should be the very first iteration of the source code writers
         // to ensure that the options are properly setup for all emitters.
-        e.SetupOptionsIfNone(Options);
+        if (!_areOptionsSetup)
+        {
+            e.SetupOptionsIfNone(Options);
+            _areOptionsSetup = true;
+        }
 
         return e.GetOuterUsingDirectives(target);
     });
 
     /// <inheritdoc/>
-    protected override IEnumerable<string> GetTargetInnerUsingDirectives(TSpec target) 
+    protected internal override IEnumerable<string> GetTargetInnerUsingDirectives(TSpec target) 
         => GetSourceCodeEmitters().SelectMany(e => e.GetInnerUsingDirectives(target));
 }

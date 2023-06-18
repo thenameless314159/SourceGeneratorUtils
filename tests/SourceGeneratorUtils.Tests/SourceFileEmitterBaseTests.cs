@@ -167,10 +167,10 @@ public class SourceFileEmitterBaseTests
             writer.WriteLine("// " + target.Comment);
         }
 
-        protected override IReadOnlyList<string> GetTargetOuterUsingDirectives(TestSourceGenerationSpec target)
+        protected internal override IReadOnlyList<string> GetTargetOuterUsingDirectives(TestSourceGenerationSpec target)
             => target.OuterUsingDirectives;
 
-        protected override IReadOnlyList<string> GetTargetInnerUsingDirectives(TestSourceGenerationSpec target)
+        protected internal override IReadOnlyList<string> GetTargetInnerUsingDirectives(TestSourceGenerationSpec target)
             => target.InnerUsingDirectives;
     }
 }

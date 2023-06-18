@@ -42,14 +42,14 @@ public abstract class SourceFileEmitterBase<TSpec> : ISourceFileGenerator<TSpec>
     /// </summary>
     /// <param name="target">The target <typeparamref name="TSpec"/>.</param>
     /// <returns>A list of the additional outer using directives.</returns>
-    protected virtual IEnumerable<string> GetTargetOuterUsingDirectives(TSpec target) => Enumerable.Empty<string>();
+    protected internal virtual IEnumerable<string> GetTargetOuterUsingDirectives(TSpec target) => Enumerable.Empty<string>();
 
     /// <summary>
     /// Allows to specify additional inner using directives to apply based on the target <typeparamref name="TSpec"/>.
     /// </summary>
     /// <param name="target">The target <typeparamref name="TSpec"/>.</param>
     /// <returns>A list of the additional inner using directives.</returns>
-    protected virtual IEnumerable<string> GetTargetInnerUsingDirectives(TSpec target) => Enumerable.Empty<string>();
+    protected internal virtual IEnumerable<string> GetTargetInnerUsingDirectives(TSpec target) => Enumerable.Empty<string>();
 
     /// <inheritdoc />
     public SourceFile GenerateSource(TSpec target)
