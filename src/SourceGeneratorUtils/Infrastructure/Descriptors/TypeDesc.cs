@@ -28,6 +28,17 @@ public sealed class TypeDesc : ITypeDescriptor, IEquatable<TypeDesc>
     public required bool IsValueType { get; init; }
 
     /// <summary>
+    /// Gets or init whether the type is a record.
+    /// </summary>
+    public required bool IsRecord { get; init; }
+
+    /// <summary>
+    /// Gets or init the type modifier (sealed, unsafe, partial...).
+    /// </summary>
+    // review: may make an enum out of it
+    public required string? TypeModifier { get; init; }
+
+    /// <summary>
     /// Gets or init the type kind.
     /// </summary>
     public required TypeKind TypeKind { get; init; }
@@ -100,8 +111,10 @@ public sealed class TypeDesc : ITypeDescriptor, IEquatable<TypeDesc>
     public bool Equals(TypeDesc? other) => other != null 
         && Name == other.Name
         && Namespace == other.Namespace
-        && TypeKind == other.TypeKind
         && IsValueType == other.IsValueType
+        && IsRecord == other.IsRecord
+        && TypeKind == other.TypeKind
+        && TypeModifier == other.TypeModifier
         && Accessibility == other.Accessibility
         && Attributes.Equals(other.Attributes)
         && Interfaces.Equals(other.Interfaces)
@@ -119,13 +132,15 @@ public sealed class TypeDesc : ITypeDescriptor, IEquatable<TypeDesc>
     public override bool Equals(object? obj) => Equals(obj as TypeDesc);
 
     /// <inheritdoc/>
-    // review: Currently relies on ValueTuple comparison due to lack of HashCode.Combine() in netstandard2.0,
-    // may implement it manually in the future.
+    // review: Currently relies on ValueTuple comparison for convenience and
+    // due to lack of HashCode.Combine() in netstandard2.0, may implement it manually in the future.
     public override int GetHashCode() =>
     ( 
         Name,
         Namespace,
+        TypeModifier,
         TypeKind,
+        IsRecord,
         IsValueType,
         Accessibility,
         Attributes,
