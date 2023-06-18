@@ -14,6 +14,19 @@ public class SourceWriterTests
     [Fact] public void Indentation_Setter_ThrowsIfIndentationIsLessThanOne() 
         => Throws<ArgumentOutOfRangeException>(() => new SourceWriter { Indentation = -1 });
 
+    [Theory, InlineData(0), InlineData(1), InlineData(8)]
+    public void WriteEmptyLines_ShouldAppendNewLines(int linesCount)
+    {
+        var sourceWriter = new SourceWriter();
+        sourceWriter.WriteEmptyLines(linesCount);
+
+        var expected = new StringBuilder()
+            .Insert(0, Environment.NewLine, linesCount)
+            .ToString();
+
+        Equal(expected, sourceWriter.ToString());
+    }
+
     const string SeveralLinesStringLiteralConstant = """
         Test case with
         several

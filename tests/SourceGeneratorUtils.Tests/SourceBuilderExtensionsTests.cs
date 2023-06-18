@@ -2,11 +2,11 @@
 
 public class SourceBuilderExtensionsTests
 {
-    private static readonly DefaultTypeSpec[] _descriptors =
+    private static readonly (string Name, string Content)[] _descriptors =
     {
-        new("Test", "class", "SourceGeneratorUtils.Tests"),
-        new("Test2", "partial class", "SourceGeneratorUtils.Tests"),
-        new("NamelessClass", "partial class", "SourceGeneratorUtils.Tests"),
+        new("Test", "// Hello There !"),
+        new("Test2", "using SourceGeneratorUtils.Tests;"),
+        new("NamelessClass", "using SourceGeneratorUtils.Tests;"),
     };
 
     [Fact]
@@ -17,7 +17,7 @@ public class SourceBuilderExtensionsTests
 
         builder.Register(srcFileGenerator, _descriptors[0]);
         True(builder.SourceFiles.TryGetValue("Test", out var generatedFile));
-        Equal("Hello There!" + Environment.NewLine, generatedFile.ToString());
+        Equal(_descriptors[0].Content + Environment.NewLine, generatedFile.ToString());
     }
 
     [Fact]
@@ -36,18 +36,16 @@ public class SourceBuilderExtensionsTests
 
     private static void VerifySourceBuilder(SourceBuilder builder)
     {
-        foreach (var desc in _descriptors)
+        foreach (var (name, content) in _descriptors)
         {
-            True(builder.SourceFiles.TryGetValue(desc.Name, out var generatedFile));
-            Equal("Hello There!" + Environment.NewLine, generatedFile.ToString());
+            True(builder.SourceFiles.TryGetValue(name, out var generatedFile));
+            Equal(content + Environment.NewLine, generatedFile.ToString());
         }
     }
 
-    private class TestSourceFileGenerator : ISourceFileGenerator<DefaultTypeSpec>
+    private class TestSourceFileGenerator : ISourceFileGenerator<(string Name, string Content)>
     {
-        public SourceFileDescriptor GenerateSource(DefaultTypeSpec target)
-        {
-            return new(target.Name, new SourceWriter().WriteLine("Hello There!"));
-        }
+        public SourceFile GenerateSource((string Name, string Content) target)
+            => new(target.Name, new SourceWriter().WriteLine(target.Content));
     }
 }

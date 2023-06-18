@@ -1,0 +1,106 @@
+﻿using System.Runtime.InteropServices;
+using System.Text;
+
+namespace SourceGeneratorUtils.Tests;
+
+public class SourceFileEmitterTests
+{
+    private static readonly TestSourceGenerationSpec DefaultSpec = new() { Namespace = "SourceGeneratorUtils.Tests" };
+    private static readonly SourceCodeEmitter<TestSourceGenerationSpec>[] _sourceCodeEmitters =
+    {
+        new TestSourceCodeEmitter(),
+        new SourceCodeEmitterWithUsingDirectives()
+    };
+
+    [Theory, InlineData(true), InlineData(false)]
+    public void GenerateSource_ShouldSetupOptionsOnSourceCodeWritersIfNone(bool optionAlreadySetup)
+    {
+        var sourceCodeEmitters = optionAlreadySetup 
+            ? new[] { new TestSourceCodeEmitter { Options = new SourceFileEmitterOptions { SpacesBetweenDeclarations = 2 } } }
+            : new[] { new TestSourceCodeEmitter() };
+
+        var emitter = new TestSourceFileEmitter { SourceCodeEmitters = sourceCodeEmitters };
+        _ = emitter.GenerateSource(DefaultSpec);
+
+        if (optionAlreadySetup) NotEqual(SourceFileEmitterOptions.Default, sourceCodeEmitters[0].Options);
+        else Equal(SourceFileEmitterOptions.Default, sourceCodeEmitters[0].Options);
+    }
+
+    [Theory, InlineData(-1), InlineData(0), InlineData(1), InlineData(2), InlineData(16)]
+    public void EmitTargetSourceCode_ShouldEmitSourceCodeWithConfiguredSpacing(int spacesBetweenDeclarations)
+    {
+        var emitter = new TestSourceFileEmitter(new SourceFileEmitterOptions
+        {
+            SpacesBetweenDeclarations = spacesBetweenDeclarations }) {
+            SourceCodeEmitters = _sourceCodeEmitters
+        };
+
+        var writer = new SourceWriter();
+        emitter.EmitTargetSourceCode(DefaultSpec, writer);
+
+        string expected = $"""
+            // {DefaultSpec.Comment}{EmptyOrNewLines(spacesBetweenDeclarations)}
+            // {DefaultSpec.Comment2}
+            """;
+
+        StartsWith(expected, writer.ToString());
+    }
+
+    private static string EmptyOrNewLines(int count)
+    {
+        if (count < 1) return string.Empty;
+
+        var builder = new StringBuilder();
+        for (int i = 0; i < count; i++) 
+            builder.AppendLine();
+
+        return builder.ToString();
+    }
+
+    private sealed record TestSourceGenerationSpec : AbstractGenerationSpec
+    {
+        public string Comment { get; init; } = "Hello There !";
+        public string Comment2 { get; init; } = "Welcome !";
+    }
+
+    private sealed class TestSourceCodeEmitter : SourceCodeEmitter<TestSourceGenerationSpec>
+    {
+        public override void EmitTargetSourceCode(TestSourceGenerationSpec target, SourceWriter writer)
+        {
+            writer.WriteLine("// " + target.Comment);
+        }
+    }
+
+    private sealed class SourceCodeEmitterWithUsingDirectives : SourceCodeEmitter<TestSourceGenerationSpec>
+    {
+        public IReadOnlyList<string> OuterUsingDirectives { get; init; } = Array.Empty<string>();
+        public IReadOnlyList<string> InnerUsingDirectives { get; init; } = Array.Empty<string>();
+
+        public override void EmitTargetSourceCode(TestSourceGenerationSpec target, SourceWriter writer)
+        {
+            writer.WriteLine("// " + target.Comment2);
+        }
+
+        public override IEnumerable<string> GetOuterUsingDirectives(TestSourceGenerationSpec target) => OuterUsingDirectives;
+        public override IEnumerable<string> GetInnerUsingDirectives(TestSourceGenerationSpec target) => InnerUsingDirectives;
+    }
+
+    private sealed class TestSourceFileEmitter : SourceFileEmitter<TestSourceGenerationSpec>
+    {
+        public IReadOnlyList<SourceCodeEmitter<TestSourceGenerationSpec>> SourceCodeEmitters { get; init; } 
+            = Array.Empty<SourceCodeEmitter<TestSourceGenerationSpec>>();
+
+        public TestSourceFileEmitter(SourceFileEmitterOptions options) : base(options)
+        {
+        }
+
+        public TestSourceFileEmitter() : base(SourceFileEmitterOptions.Default)
+        {
+        }
+
+        public override string GetFileName(TestSourceGenerationSpec target) => string.Empty;
+
+        public override IEnumerable<SourceCodeEmitter<TestSourceGenerationSpec>> GetSourceCodeEmitters()
+            => SourceCodeEmitters;
+    }
+}
