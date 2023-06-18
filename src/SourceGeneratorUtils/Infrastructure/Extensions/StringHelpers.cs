@@ -58,6 +58,7 @@ public static class StringHelpers
         input = input.TrimStart();
         input = input.TrimEnd();
 
+        // review : should handle static using directives
         var startsWithUsing = input.StartsWith("using");
         var endsWithSemiColon = input.EndsWith(";");
 

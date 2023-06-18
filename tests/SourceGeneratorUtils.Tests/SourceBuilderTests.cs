@@ -18,7 +18,7 @@ public class SourceBuilderTests
     [Fact]
     public void Ctor_WithDescriptors_ShouldPopulateSourceFiles()
     {
-        var sourceFiles = new SourceFileDescriptor[]
+        var sourceFiles = new SourceFile[]
         {
             new("file1.cs", new SourceWriter()),
             new("file2.g.cs", new SourceWriter())
@@ -47,7 +47,7 @@ public class SourceBuilderTests
     [Fact]
     public void Register_Descriptor_ShouldAddSingleFileToSourceFiles()
     {
-        SourceFileDescriptor descriptor = new("file.g.cs", new SourceWriter());
+        SourceFile descriptor = new("file.g.cs", new SourceWriter());
         var sourceBuilder = new SourceBuilder();
 
         sourceBuilder.Register(in descriptor);
@@ -89,7 +89,7 @@ public class SourceBuilderTests
     [Fact]
     public void Register_Descriptors_ShouldAddAllFilesToSourceFiles()
     {
-        var sourceFiles = new List<SourceFileDescriptor>
+        var sourceFiles = new List<SourceFile>
         {
             new("file1.cs", new SourceWriter()),
             new("file2.cs", new SourceWriter())
@@ -104,7 +104,7 @@ public class SourceBuilderTests
     [Fact]
     public void Register_DescriptorsArray_ShouldAddAllFilesToSourceFiles()
     {
-        var sourceFiles = new SourceFileDescriptor[]
+        var sourceFiles = new SourceFile[]
         {
             new("file1.cs", new SourceWriter()),
             new("file2.cs", new SourceWriter())
@@ -141,7 +141,7 @@ public class SourceBuilderTests
         Equal(_testSourceFiles[file2].ToString(), file2Content);
 
         directory.Refresh();
-        directory.Delete(true);
+        directory.Delete(true); // cleanup
     }
 
     [Fact]
@@ -163,6 +163,6 @@ public class SourceBuilderTests
         Equal(_testSourceFiles[file2].ToString(), file2Content);
 
         directory.Refresh();
-        directory.Delete(true);
+        directory.Delete(true); // cleanup
     }
 }

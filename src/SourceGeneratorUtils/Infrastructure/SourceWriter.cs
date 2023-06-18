@@ -111,6 +111,19 @@ public sealed class SourceWriter
     }
 
     /// <summary>
+    /// Writes <paramref name="linesCount"/> empty lines to the text stream.
+    /// </summary>
+    /// <param name="linesCount">The number of empty lines to append to the text stream.</param>
+    /// <returns>A self <see cref="SourceWriter"/> instance to chain calls.</returns>
+    public SourceWriter WriteEmptyLines(int linesCount)
+    {
+        for (int i = 0; i < linesCount; i++)
+            _sb.AppendLine();
+
+        return this;
+    }
+
+    /// <summary>
     /// Writes an indented character followed by the default line terminator to the text stream.
     /// </summary>
     /// <param name="value">The character to append to the text stream.</param>
@@ -154,7 +167,7 @@ public sealed class SourceWriter
     }
 
     /// <summary>
-    /// Append the default line terminator to the text stream.
+    /// Append an empty line to the text stream.
     /// </summary>
     /// <returns>A self <see cref="SourceWriter"/> instance to chain calls.</returns>
     public SourceWriter WriteLine()
@@ -166,7 +179,7 @@ public sealed class SourceWriter
     /// <summary>
     /// Gets the current text written to the stream as a <see cref="SourceText"/> representation.
     /// </summary>
-    /// <returns>A self <see cref="SourceWriter"/> instance to chain calls.</returns>
+    /// <returns>A <see cref="SourceText"/> instance with the <see cref="ToString"/> result as content.</returns>
     /// <remarks>Require to import Microsoft.CodeAnalysis.CSharp in the target assembly.</remarks>
     public SourceText ToSourceText()
     {

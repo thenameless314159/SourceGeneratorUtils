@@ -17,14 +17,14 @@ public class SourceBuilder
     public IReadOnlyDictionary<string, SourceWriter> SourceFiles => _sourceFiles;
 
     /// <summary>
-    /// Gets the generated source files as <see cref="SourceFileDescriptor"/>.
+    /// Gets the generated source files as <see cref="SourceFile"/>s.
     /// </summary>
-    public IEnumerable<SourceFileDescriptor> SourceFileDescriptors
+    public IEnumerable<SourceFile> SourceFileDescriptors
     {
         get
         {
             foreach (KeyValuePair<string, SourceWriter> kvp in _sourceFiles)
-                yield return new SourceFileDescriptor(kvp.Key, kvp.Value);
+                yield return new SourceFile(kvp.Key, kvp.Value);
         }
     }
 
@@ -44,7 +44,7 @@ public class SourceBuilder
     /// Initializes a new instance of the <see cref="SourceBuilder"/> class with the given initial source files.
     /// </summary>
     /// <param name="sourceFiles">The initial source files.</param>
-    public SourceBuilder(IEnumerable<SourceFileDescriptor> sourceFiles) : this() => Register(sourceFiles);
+    public SourceBuilder(IEnumerable<SourceFile> sourceFiles) : this() => Register(sourceFiles);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SourceBuilder"/> class with the given initial capacity.
@@ -92,17 +92,17 @@ public class SourceBuilder
     /// </summary>
     /// <param name="sourceFiles">The source files to register.</param>
     /// <returns>A self <see cref="SourceBuilder"/> instance to chain calls.</returns>
-    public SourceBuilder Register(IEnumerable<SourceFileDescriptor> sourceFiles)
+    public SourceBuilder Register(IEnumerable<SourceFile> sourceFiles)
     {
         // fast path if the sourceFiles are contained within an array
-        if (sourceFiles is SourceFileDescriptor[] sourceFileArray)
+        if (sourceFiles is SourceFile[] sourceFileArray)
         {
-            foreach (ref readonly SourceFileDescriptor kvp in sourceFileArray.AsSpan())
+            foreach (ref readonly SourceFile kvp in sourceFileArray.AsSpan())
                 _sourceFiles[kvp.Name] = kvp.Content;
         }
 #if DOTNET7_0_OR_GREATER
         // fast path if the sourceFiles are contained within a list
-        else if (sourceFiles is List<SourceFileDescriptor> sourceFileList)
+        else if (sourceFiles is List<SourceFile> sourceFileList)
         {
             foreach (ref readonly SourceFileDescriptor kvp in CollectionsMarshal.AsSpan(sourceFileList))
                 _sourceFiles[kvp.Name] = kvp.Content;
@@ -110,7 +110,7 @@ public class SourceBuilder
 #endif
         else
         {
-            foreach (SourceFileDescriptor kvp in sourceFiles)
+            foreach (SourceFile kvp in sourceFiles)
                 _sourceFiles[kvp.Name] = kvp.Content;
         }
 
@@ -135,7 +135,7 @@ public class SourceBuilder
     /// </summary>
     /// <param name="descriptor">The source file descriptor.</param>
     /// <returns>A self <see cref="SourceBuilder"/> instance to chain calls.</returns>
-    public SourceBuilder Register(in SourceFileDescriptor descriptor)
+    public SourceBuilder Register(in SourceFile descriptor)
     {
         _sourceFiles[descriptor.Name] = descriptor.Content;
         return this;
