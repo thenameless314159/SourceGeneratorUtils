@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace SourceGeneratorUtils;
+﻿namespace SourceGeneratorUtils;
 
 /// <summary>
 /// An abstraction relying on <see cref="SourceCodeEmitter{TSpec}"/>s to emit source files for the given target <typeparamref name="TSpec"/>.

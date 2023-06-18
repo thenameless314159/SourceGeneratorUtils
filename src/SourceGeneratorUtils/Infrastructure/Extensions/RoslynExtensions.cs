@@ -12,6 +12,6 @@ public static class RoslynExtensions
     /// </summary>
     /// <param name="type">The type symbol.</param>
     /// <returns>The fully qualified type name.</returns>
-    public static string GetFullyQualifiedName(this ITypeSymbol type) 
+    public static string GetFullyQualifiedAssemblyName(this ITypeSymbol type) 
         => type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 }
