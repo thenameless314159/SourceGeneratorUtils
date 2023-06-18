@@ -6,6 +6,14 @@ public class SourceFileEmitterBaseTests
     private readonly TestSourceFileEmitter _emitter = new(SourceFileEmitterOptions.Default);
 
     [Fact]
+    public void GetTargetOuterUsingDirectives_ReturnsEmptyEnumerable()
+        => Empty(_emitter.GetTargetOuterUsingDirectives(DefaultSpec));
+
+    [Fact]
+    public void GetTargetInnerUsingDirectives_ReturnsEmptyEnumerable()
+        => Empty(_emitter.GetTargetInnerUsingDirectives(DefaultSpec));
+
+    [Fact]
     public void GenerateSource_ShouldEmitSourceFileWithNameAndContent()
     {
         var sourceFile = _emitter.GenerateSource(DefaultSpec);

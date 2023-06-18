@@ -42,6 +42,7 @@ public abstract class SourceFileEmitterBase<TSpec> : ISourceFileGenerator<TSpec>
     /// </summary>
     /// <param name="target">The target <typeparamref name="TSpec"/>.</param>
     /// <returns>A list of the additional outer using directives.</returns>
+    /// <remarks> Made protected internal for testing purposes.</remarks>
     protected internal virtual IEnumerable<string> GetTargetOuterUsingDirectives(TSpec target) => Enumerable.Empty<string>();
 
     /// <summary>
@@ -49,6 +50,7 @@ public abstract class SourceFileEmitterBase<TSpec> : ISourceFileGenerator<TSpec>
     /// </summary>
     /// <param name="target">The target <typeparamref name="TSpec"/>.</param>
     /// <returns>A list of the additional inner using directives.</returns>
+    /// <remarks> Made protected internal for testing purposes.</remarks>
     protected internal virtual IEnumerable<string> GetTargetInnerUsingDirectives(TSpec target) => Enumerable.Empty<string>();
 
     /// <inheritdoc />
@@ -78,13 +80,14 @@ public abstract class SourceFileEmitterBase<TSpec> : ISourceFileGenerator<TSpec>
         // Emit the nullable directive on top.
         writer.WriteLine($"#nullable {EnableOrDisable(Options.EnableNullableAnnotations)} annotations");
         writer.WriteLine($"#nullable {EnableOrDisable(Options.EnableNullableWarnings)} warnings");
-        writer.WriteLine();
+
+        writer.WriteEmptyLines(Options.SpacesBetweenDeclarations);
 
         // Suppress any warnings specified in options.
         if (Options.SuppressWarnings.Count > 0)
         {
             writer.WriteLine($"#pragma warning disable {string.Join(CommaWithSpace, Options.SuppressWarnings)}");
-            writer.WriteLine();
+            writer.WriteEmptyLines(Options.SpacesBetweenDeclarations);
         }
 
         // Emit the outer using directives if any.
@@ -97,20 +100,22 @@ public abstract class SourceFileEmitterBase<TSpec> : ISourceFileGenerator<TSpec>
                     .Concat(targetOuterUsingDirectives));
 
             writer.WriteLine(string.Join(Environment.NewLine, outerUsingDirectives));
-            writer.WriteLine();
         }
 
         // Emit the namespace declaration if any.
         if (target.Namespace == null) // review: must check global namespace instead
-            return writer; 
+            return writer;
+
+        writer.WriteEmptyLines(Options.SpacesBetweenDeclarations);
 
         // review: should add spacing according to options and what was previously emitted
-        if (Options.UseFileScopedNamespace)
-                writer.WriteLine($"namespace {target.Namespace};")
-                    .WriteLine();
-        else
-            writer.WriteLine($"namespace {target.Namespace}")
-                    .OpenBlock();
+        if (Options.UseFileScopedNamespace) 
+            writer
+                .WriteLine($"namespace {target.Namespace};")
+                .WriteEmptyLines(Options.SpacesBetweenDeclarations);
+        else writer
+                .WriteLine($"namespace {target.Namespace}")
+                .OpenBlock();
 
         // Emit the inner using directives if a namespace have been declared and if any are present.
         IReadOnlyList<string> targetInnerUsingDirectives = GetTargetInnerUsingDirectives(target).ToList();
@@ -122,7 +127,7 @@ public abstract class SourceFileEmitterBase<TSpec> : ISourceFileGenerator<TSpec>
                     .Concat(targetInnerUsingDirectives));
 
             writer.WriteLine(string.Join(Environment.NewLine, innerUsingDirectives));
-            writer.WriteLine();
+            writer.WriteEmptyLines(Options.SpacesBetweenDeclarations);
         }
 
         return writer;
