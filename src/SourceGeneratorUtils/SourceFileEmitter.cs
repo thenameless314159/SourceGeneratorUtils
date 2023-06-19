@@ -6,7 +6,10 @@
 /// <typeparam name="TSpec">The target specification type to emit source files for.</typeparam>
 public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> where TSpec : AbstractGenerationSpec
 {
-    internal bool _areOptionsSetup; // internal for testing purposes
+    /// <summary>
+    /// The number of blank lines to add between each source code writers.
+    /// </summary>
+    public int BlankLinesBetweenSourceCodeWriters { get; init; } = 1;
 
     /// <inheritdoc/>
     protected SourceFileEmitter(SourceFileEmitterOptions options) : base(options)
@@ -36,8 +39,8 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
 
             hasNext = emitters.MoveNext(); // Move to next emitter
 
-            // Emit configured spacing between each emitter if something has been emitted and if we have more to emit
-            if (lengthBefore < writer.Length && hasNext) writer.WriteEmptyLines(Options.SpacesBetweenDeclarations);
+            // Emit configured blank lines between each emitter if something has been emitted and if we have more to emit
+            if (writer.Length > lengthBefore && hasNext) writer.WriteEmptyLines(BlankLinesBetweenSourceCodeWriters);
         }
     }
 
@@ -46,11 +49,7 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
     {
         // Setup the options here since this should be the very first iteration of the source code writers
         // to ensure that the options are properly setup for all emitters.
-        if (!_areOptionsSetup)
-        {
-            e.SetupOptionsIfNone(Options);
-            _areOptionsSetup = true;
-        }
+        e.SetupOptionsIfNone(Options); // review: kind of a dirty trick, should find a cleaner way to ensure this
 
         return e.GetOuterUsingDirectives(target);
     });

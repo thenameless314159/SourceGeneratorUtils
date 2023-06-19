@@ -4,58 +4,62 @@ using System.Diagnostics;
 namespace SourceGeneratorUtils;
 
 /// <summary>
-/// Provides a default implementation of <see cref="SourceFileEmitter{TSpec}"/> using <see cref="TypeGenerationSpec"/>.
+/// Provides another <see cref="SourceFileEmitter{TSpec}"/> abstraction using an implementation of <see cref="AbstractTypeGenerationSpec"/>.
+/// This abstraction takes care of the types declarations and allows to specify additional attributes and interfaces to apply on the target type declaration.
 /// </summary>
-public class TypeSourceFileEmitter : SourceFileEmitter<TypeGenerationSpec>
+public abstract class TypeSourceFileEmitter<TSpec> : SourceFileEmitter<TSpec> where TSpec : AbstractTypeGenerationSpec
 {
     /// <inheritdoc cref="SourceFileEmitterBase{TSpec}.Options"/>
     public new TypeSourceFileEmitterOptions Options => (TypeSourceFileEmitterOptions)base.Options;
 
     /// <summary>
-    /// Gets or init the list of <see cref="TypeSourceCodeEmitter"/> to use to generate source code.
-    /// </summary>
-    public IReadOnlyList<TypeSourceCodeEmitter> Emitters { get; init; } = Array.Empty<TypeSourceCodeEmitter>();
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TypeSourceFileEmitter"/> class with the given <see cref="TypeSourceFileEmitterOptions"/>.
+    /// Initializes a new instance of the <see cref="TypeSourceFileEmitter{TSpec}"/> class with the given <see cref="TypeSourceFileEmitterOptions"/>.
     /// </summary>
     /// <param name="options">The options to use to generate source files.</param>
-    public TypeSourceFileEmitter(TypeSourceFileEmitterOptions options) : base(options)
+    protected TypeSourceFileEmitter(TypeSourceFileEmitterOptions options) : base(options)
     {
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="TypeSourceFileEmitter"/> class with the default <see cref="TypeSourceFileEmitterOptions"/>.
+    /// Gets the <see cref="SourceCodeEmitter{TSpec}"/>s to use for emitting source code for the given target <typeparamref name="TSpec"/>.
     /// </summary>
-    public TypeSourceFileEmitter() : this(TypeSourceFileEmitterOptions.Default)
-    {
-    }
+    /// <returns>An enumerable of <see cref="SourceCodeEmitter{TSpec}"/> instances.</returns>
+    /// <remarks>
+    /// This will be called several times during the generation process,
+    /// please make sure to implement from an immutable or static enumerable.
+    /// </remarks>
+    public abstract IEnumerable<TypeSourceCodeEmitter<TSpec>> GetTypeSourceCodeEmitters();
+
 
     /// <summary>
-    /// Allows to specify additional attributes to apply based on the target <see cref="TypeGenerationSpec"/>.
+    /// Allows to specify additional attributes to apply based on the target <typeparamref name="TSpec"/>.
     /// </summary>
-    /// <param name="target">The target <see cref="TypeGenerationSpec"/>.</param>
+    /// <param name="target">The target <typeparamref name="TSpec"/>.</param>
     /// <returns>A list of the additional attributes.</returns>
-    protected internal virtual IEnumerable<string> GetTargetAttributesToApply(TypeGenerationSpec target)
-        => Emitters.SelectMany(e => e.GetAttributesToApply(target));
+    protected internal virtual IEnumerable<string> GetTargetAttributesToApply(TSpec target)
+        => GetTypeSourceCodeEmitters().SelectMany(e => e.GetAttributesToApply(target));
 
     /// <summary>
-    /// Allows to specify additional interfaces to implements based on the target <see cref="TypeGenerationSpec"/>.
+    /// Allows to specify additional interfaces to implements based on the target <typeparamref name="TSpec"/>.
     /// </summary>
-    /// <param name="target">The target <see cref="TypeGenerationSpec"/>.</param>
+    /// <param name="target">The target <typeparamref name="TSpec"/>.</param>
     /// <returns>A list of the additional additional interfaces to implement.</returns>
-    protected internal virtual IEnumerable<string> GetTargetInterfacesToImplement(TypeGenerationSpec target)
-        => Emitters.SelectMany(e => e.GetInterfacesToImplement(target));
+    protected internal virtual IEnumerable<string> GetTargetInterfacesToImplement(TSpec target)
+        => GetTypeSourceCodeEmitters().SelectMany(e => e.GetInterfacesToImplement(target));
 
     /// <inheritdoc />
-    public override IEnumerable<SourceCodeEmitter<TypeGenerationSpec>> GetSourceCodeEmitters() => Emitters;
+    public override IEnumerable<SourceCodeEmitter<TSpec>> GetSourceCodeEmitters() => GetTypeSourceCodeEmitters();
 
-    /// <inheritdoc/>
-    public override string GetFileName(TypeGenerationSpec target) => $"{target.TargetType.Name}.g.cs";
-
-    /// <inheritdoc/>
-    public override void EmitTargetSourceCode(TypeGenerationSpec target, SourceWriter writer)
+    /// <summary>
+    /// Creates a <see cref="SourceWriter"/> with the appropriate header and type declarations for the given target <typeparamref name="TSpec"/>.
+    /// This will leave the writer right after the target type declaration allowing to emit the body of the target <typeparamref name="TSpec"/>.
+    /// </summary>
+    /// <param name="target">The target <typeparamref name="TSpec"/> whose header, optional namespace and type declarations needs to be emitted.</param>
+    /// <returns>A <see cref="SourceWriter"/> at the type body declaration.</returns>
+    public override SourceWriter CreateSourceWriter(TSpec target)
     {
+        var writer = base.CreateSourceWriter(target);
+
         // Emit the classes declarations.
         ImmutableEquatableArray<string> specClasses = target.TypeDeclarations;
         Debug.Assert(specClasses.Count > 0);
@@ -76,8 +80,6 @@ public class TypeSourceFileEmitter : SourceFileEmitter<TypeGenerationSpec>
                 Options.UseCombinedAttributeDeclaration
                     ? $"[{string.Join(", ", attributes)}]"
                     : string.Join(Environment.NewLine, attributes.Select(static a => $"[{a}]")));
-
-            writer.WriteLine();
         }
 
         // Emit the GeneratedCodeAttribute if needed.
@@ -94,15 +96,16 @@ public class TypeSourceFileEmitter : SourceFileEmitter<TypeGenerationSpec>
             : null;
 
         string targetDeclaration = specClasses[0];
-        int baseTargetDeclarationIndex = targetDeclaration.AsSpan().IndexOf(':');
+        int baseTargetDeclarationIndex = targetDeclaration.IndexOf(':');
         string? baseType = baseTargetDeclarationIndex == -1 ? Options.DefaultBaseType : null;
 
         bool hasBaseType = !string.IsNullOrWhiteSpace(baseType);
         bool hasInterfaces = !string.IsNullOrWhiteSpace(interfacesToImplement);
-        string baseTypeWithInterfaces = !string.IsNullOrWhiteSpace(baseType) || !string.IsNullOrWhiteSpace(interfacesToImplement)
-            // review: must check if base type implemented or any interface matches already implemented bases
+
+        // review: may need to add some distinct filters to avoid duplicates.
+        string baseTypeWithInterfaces = hasBaseType || hasInterfaces
             ? SeparatorOrEmpty(baseTargetDeclarationIndex != -1, " : ")
-                + (baseType ?? string.Empty) 
+                + (baseType ?? string.Empty)
                 + SeparatorOrEmpty(hasBaseType && hasInterfaces, CommaWithSpace)
                 + interfacesToImplement
             : string.Empty;
@@ -110,8 +113,8 @@ public class TypeSourceFileEmitter : SourceFileEmitter<TypeGenerationSpec>
         // Emit the target class declaration with it's body.
         writer.WriteLine($"{targetDeclaration}{baseTypeWithInterfaces}");
         writer.OpenBlock();
-        base.EmitTargetSourceCode(target, writer);
-        writer.CloseBlock();
+        
+        return writer;
 
         static string SeparatorOrEmpty(bool hasBaseTypeAndInterface, string separator) => hasBaseTypeAndInterface ? separator : string.Empty;
     }

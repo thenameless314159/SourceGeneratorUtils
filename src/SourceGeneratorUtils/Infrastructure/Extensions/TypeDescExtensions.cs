@@ -53,9 +53,9 @@ public static class TypeDescExtensions
         if (descriptor.GenericTypes.Count > 0)
             AppendGenericTypes(descriptor.GenericTypes, sb);
 
-        return sb.ToString();
+        return sb.ToString(); // review: append base types and interfaces as well ? may not be needed
 
-        // review: might need to refactor to use a non-recursive approach
+        // review: might need a rework for a non-recursive approach instead
         static void AppendGenericTypes(IReadOnlyList<TypeDesc> genericTypes, StringBuilder sb)
         {
             for (int i = 0; i < genericTypes.Count; i++)

@@ -3,7 +3,7 @@
 namespace SourceGeneratorUtils;
 
 /// <summary>
-/// Represents the options to use when emitting C# source file within the <see cref="TypeSourceFileEmitter"/> abstraction.
+/// Represents the options to use when emitting C# source file within the <see cref="TypeSourceFileEmitter{TSpec}"/> abstraction.
 /// </summary>
 public record TypeSourceFileEmitterOptions : SourceFileEmitterOptions
 {

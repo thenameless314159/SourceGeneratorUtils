@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using System.Reflection;
 
 namespace SourceGeneratorUtils;
 

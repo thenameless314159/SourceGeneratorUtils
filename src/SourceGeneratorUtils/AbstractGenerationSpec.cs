@@ -3,7 +3,6 @@
 /// <summary>
 /// A basic abstractions that must be implemented with relevant members for your source generation logic
 /// in order to models common specifications for generated source code.
-/// This abstractions only contains an optional namespace member.
 /// </summary>
 /// <remarks>
 /// For source generators, type needs to be cacheable as a Roslyn incremental value so it must be
@@ -24,5 +23,5 @@ public abstract record AbstractGenerationSpec
     /// <summary>
     /// Gets or init the namespace of the generated source file.
     /// </summary>
-    public string? Namespace { get; init; }
+    public required string? Namespace { get; init; }
 }

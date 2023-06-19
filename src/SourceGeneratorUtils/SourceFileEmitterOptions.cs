@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace SourceGeneratorUtils;
+﻿namespace SourceGeneratorUtils;
 
 /// <summary>
 /// Represents the options to use when emitting C# source file within the <see cref="SourceFileEmitterBase{TSpec}"/> abstraction.
@@ -49,7 +47,7 @@ public record SourceFileEmitterOptions
     /// <summary>
     /// The number of blank lines to add between each declarations.
     /// </summary>
-    public int SpacesBetweenDeclarations { get; init; } = 1;
+    public int BlankLinesBetweenDeclarations { get; init; } = 1;
 
     /// <summary>
     /// The analyzers warnings to suppress.

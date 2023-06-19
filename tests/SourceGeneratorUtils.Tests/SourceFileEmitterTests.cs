@@ -51,34 +51,29 @@ public class SourceFileEmitterTests
     public void GenerateSource_ShouldSetupOptionsOnSourceCodeWritersIfNone(bool optionAlreadySetup)
     {
         var sourceCodeEmitters = optionAlreadySetup 
-            ? new[] { new TestSourceCodeEmitter { Options = new SourceFileEmitterOptions { SpacesBetweenDeclarations = 2 } } }
+            ? new[] { new TestSourceCodeEmitter { Options = new SourceFileEmitterOptions { BlankLinesBetweenDeclarations = 2 } } }
             : new[] { new TestSourceCodeEmitter() };
 
         var emitter = new TestSourceFileEmitter { SourceCodeEmitters = sourceCodeEmitters };
-
-        False(emitter._areOptionsSetup);
         _ = emitter.GenerateSource(DefaultSpec);
 
         if (optionAlreadySetup) NotEqual(SourceFileEmitterOptions.Default, sourceCodeEmitters[0].Options);
         else Equal(SourceFileEmitterOptions.Default, sourceCodeEmitters[0].Options);
-
-        True(emitter._areOptionsSetup);
     }
 
     [Theory, InlineData(-1), InlineData(0), InlineData(1), InlineData(2), InlineData(16)]
-    public void EmitTargetSourceCode_ShouldEmitSourceCodeWithConfiguredSpacing(int spacesBetweenDeclarations)
+    public void EmitTargetSourceCode_ShouldEmitSourceCodeWithConfiguredSpacing(int blankLinesBetweenSourceCodeWriters)
     {
-        var emitter = new TestSourceFileEmitter(new SourceFileEmitterOptions
-        {
-            SpacesBetweenDeclarations = spacesBetweenDeclarations }) {
-            SourceCodeEmitters = _sourceCodeEmitters
+        var emitter = new TestSourceFileEmitter {
+            SourceCodeEmitters = _sourceCodeEmitters,
+            BlankLinesBetweenSourceCodeWriters = blankLinesBetweenSourceCodeWriters
         };
 
         var writer = new SourceWriter();
         emitter.EmitTargetSourceCode(DefaultSpec, writer);
 
         string expected = $"""
-            // {DefaultSpec.Comment}{EmptyOrNewLines(spacesBetweenDeclarations)}
+            // {DefaultSpec.Comment}{EmptyOrNewLines(blankLinesBetweenSourceCodeWriters)}
             // {DefaultSpec.Comment2}
             """;
 
