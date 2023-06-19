@@ -61,38 +61,28 @@ public static class TypeDescExtensions
 
         AppendTypeNameDeclaration(descriptor, sb);
 
-        bool hasSemiColonBeenAdded = false;
-        if (descriptor.BaseTypes.Count > 0)
-        {
-            if (!hasSemiColonBeenAdded)
-            {
-                sb.Append(" : ");
-                hasSemiColonBeenAdded = true;
-            }
+        bool hasBaseType = descriptor.BaseTypes.Count > 0;
+        bool hasInterfaces = descriptor.Interfaces.Count > 0;
 
+        if (hasBaseType || hasInterfaces)
+            sb.Append(" : ");
+
+        if (hasBaseType)
             AppendTypeNameDeclaration(descriptor.BaseTypes[0], sb);
-        }
 
-        if (descriptor.Interfaces.Count > 0)
+        if (!hasInterfaces) 
+            return sb.ToString();
+
+        if (hasBaseType)
+            sb.Append(CommaWithSpace);
+
+        for (int i = 0; i < descriptor.Interfaces.Count; i++)
         {
-            if (!hasSemiColonBeenAdded)
-            {
-                sb.Append(" : ");
-            }
-            else
-            {
-                if (descriptor.BaseTypes.Count > 0)
-                    sb.Append(CommaWithSpace);
-            }
+            AppendTypeNameDeclaration(descriptor.Interfaces[i], sb);
 
-            for (int i = 0; i < descriptor.Interfaces.Count; i++)
+            if (i < descriptor.Interfaces.Count - 1)
             {
-                AppendTypeNameDeclaration(descriptor.Interfaces[i], sb);
-
-                if (i < descriptor.Interfaces.Count - 1)
-                {
-                    sb.Append(CommaWithSpace);
-                }
+                sb.Append(CommaWithSpace);
             }
         }
 
