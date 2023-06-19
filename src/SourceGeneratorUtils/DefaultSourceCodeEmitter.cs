@@ -1,7 +1,7 @@
 ﻿namespace SourceGeneratorUtils;
 
 /// <summary>
-/// Default abstraction to implement to be used in <see cref="DefaultSourceFileEmitter"/>.
+/// Default <see cref="SourceCodeEmitter{TSpec}"/> abstraction to use in <see cref="DefaultSourceFileEmitter"/>.
 /// </summary>
 public abstract class DefaultSourceCodeEmitter : TypeSourceCodeEmitter<DefaultGenerationSpec>
 {

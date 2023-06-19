@@ -1,7 +1,7 @@
 ﻿namespace SourceGeneratorUtils;
 
 /// <summary>
-/// A specification for generating source code of a given <see cref="ITypeDescriptor"/>.
+/// Specifications for generating source code of a given <see cref="ITypeDescriptor"/>.
 /// </summary>
 public sealed record DefaultGenerationSpec : AbstractTypeGenerationSpec
 {

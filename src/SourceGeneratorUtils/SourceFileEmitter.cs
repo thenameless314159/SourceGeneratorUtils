@@ -1,7 +1,8 @@
 ﻿namespace SourceGeneratorUtils;
 
 /// <summary>
-/// An abstraction relying on <see cref="SourceCodeEmitter{TSpec}"/>s to emit source files for the given target <typeparamref name="TSpec"/>.
+/// An abstraction relying on <see cref="SourceCodeEmitter{TSpec}"/>s to emit source files for the given target <typeparamref name="TSpec"/>
+/// using configured <see cref="SourceCodeEmitter{TSpec}"/>s to emit source code.
 /// </summary>
 /// <typeparam name="TSpec">The target specification type to emit source files for.</typeparam>
 public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> where TSpec : AbstractGenerationSpec
@@ -26,7 +27,12 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
     /// </remarks>
     public abstract IEnumerable<SourceCodeEmitter<TSpec>> GetSourceCodeEmitters();
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Emits the source code for the target <typeparamref name="TSpec"/> to the provided <see cref="SourceWriter"/> based on the configured <see cref="GetSourceCodeEmitters"/> result.
+    /// The <see cref="SourceWriter"/> should be created using the <see cref="SourceFileEmitterBase{TSpec}.CreateSourceWriter"/> method.
+    /// </summary>
+    /// <param name="target">The target <typeparamref name="TSpec"/> whose implementation needs to be emitted.</param>
+    /// <param name="writer">The <see cref="SourceWriter"/> to use for emitting the target implementation, typically created using <see cref="SourceFileEmitterBase{TSpec}.CreateSourceWriter(TSpec)"/>.</param>
     public override void EmitTargetSourceCode(TSpec target, SourceWriter writer)
     {
         using IEnumerator<SourceCodeEmitter<TSpec>> emitters = GetSourceCodeEmitters().GetEnumerator();
@@ -44,7 +50,12 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
         }
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Allows to specify additional outer using directives to apply based on the target <typeparamref name="TSpec"/>.
+    /// </summary>
+    /// <param name="target">The target <typeparamref name="TSpec"/>.</param>
+    /// <returns>A list of the additional outer using directives.</returns>
+    /// <remarks> Made protected internal for testing purposes.</remarks>
     protected internal override IEnumerable<string> GetTargetOuterUsingDirectives(TSpec target) => GetSourceCodeEmitters().SelectMany(e =>
     {
         // Setup the options here since this should be the very first iteration of the source code writers
@@ -54,7 +65,12 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
         return e.GetOuterUsingDirectives(target);
     });
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Allows to specify additional inner using directives to apply based on the target <typeparamref name="TSpec"/>.
+    /// </summary>
+    /// <param name="target">The target <typeparamref name="TSpec"/>.</param>
+    /// <returns>A list of the additional inner using directives.</returns>
+    /// <remarks> Made protected internal for testing purposes.</remarks>
     protected internal override IEnumerable<string> GetTargetInnerUsingDirectives(TSpec target) 
         => GetSourceCodeEmitters().SelectMany(e => e.GetInnerUsingDirectives(target));
 }

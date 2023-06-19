@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace SourceGeneratorUtils;
 
 /// <summary>
-/// Provides another <see cref="SourceFileEmitter{TSpec}"/> abstraction using an implementation of <see cref="AbstractTypeGenerationSpec"/>.
+/// Provides a <see cref="SourceFileEmitter{TSpec}"/> abstraction using an implementation of <see cref="AbstractTypeGenerationSpec"/>.
 /// This abstraction takes care of the types declarations and allows to specify additional attributes and interfaces to apply on the target type declaration.
 /// </summary>
 public abstract class TypeSourceFileEmitter<TSpec> : SourceFileEmitter<TSpec> where TSpec : AbstractTypeGenerationSpec
@@ -47,7 +47,10 @@ public abstract class TypeSourceFileEmitter<TSpec> : SourceFileEmitter<TSpec> wh
     protected internal virtual IEnumerable<string> GetTargetInterfacesToImplement(TSpec target)
         => GetTypeSourceCodeEmitters().SelectMany(e => e.GetInterfacesToImplement(target));
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the <see cref="SourceCodeEmitter{TSpec}"/>s to use for emitting source code for the given target <typeparamref name="TSpec"/>.
+    /// </summary>
+    /// <returns>An enumerable of <see cref="SourceCodeEmitter{TSpec}"/> instances.</returns>
     public override IEnumerable<SourceCodeEmitter<TSpec>> GetSourceCodeEmitters() => GetTypeSourceCodeEmitters();
 
     /// <summary>
