@@ -95,23 +95,30 @@ public abstract class TypeSourceFileEmitter<TSpec> : SourceFileEmitter<TSpec> wh
             ? string.Join(", ", Options.DefaultInterfaces.Concat(targetInterfacesToImplement))
             : null;
 
+        bool hasInterfacesToImplement = !string.IsNullOrWhiteSpace(interfacesToImplement);
         string targetDeclaration = specClasses[0];
-        int baseTargetDeclarationIndex = targetDeclaration.IndexOf(':');
-        string? baseType = baseTargetDeclarationIndex == -1 ? Options.DefaultBaseType : null;
 
-        bool hasBaseType = !string.IsNullOrWhiteSpace(baseType);
-        bool hasInterfaces = !string.IsNullOrWhiteSpace(interfacesToImplement);
 
-        // review: may need to add some distinct filters to avoid duplicates.
-        string baseTypeWithInterfaces = hasBaseType || hasInterfaces
-            ? SeparatorOrEmpty(baseTargetDeclarationIndex == -1, " : ")
-                + (baseType ?? string.Empty)
-                + SeparatorOrEmpty(hasBaseType && hasInterfaces, CommaWithSpace)
-                + interfacesToImplement
-            : string.Empty;
+        // The target doesn't have any base declaration
+        if (targetDeclaration.IndexOf(':') == -1) 
+        {
+            bool hasBaseTypeToInheritFrom = !string.IsNullOrWhiteSpace(Options.DefaultBaseType);
+            bool hasBoth = hasBaseTypeToInheritFrom && hasInterfacesToImplement;
 
-        // Emit the target class declaration with it's body.
-        writer.WriteLine($"{targetDeclaration}{baseTypeWithInterfaces}");
+            string baseTypeWithInterfaces = hasBaseTypeToInheritFrom || hasInterfacesToImplement
+                ? $" : {Options.DefaultBaseType ?? string.Empty}{SeparatorOrEmpty(hasBoth, CommaWithSpace)}{interfacesToImplement}"
+                : string.Empty;
+
+            // Emit the target class declaration with base type and interfaces.
+            writer.WriteLine($"{targetDeclaration}{baseTypeWithInterfaces}");
+            writer.OpenBlock();
+            return writer;
+        }
+
+        // Emit the target class declaration with interfaces only.
+        // review: may check later whether the already declared base is an interface or not but how ?
+        //         Some non-interfaces types may start with the letter I like Index or ImmutableArray...
+        writer.WriteLine($"{targetDeclaration}{SeparatorOrEmpty(hasInterfacesToImplement, CommaWithSpace)}{interfacesToImplement}");
         writer.OpenBlock();
         
         return writer;

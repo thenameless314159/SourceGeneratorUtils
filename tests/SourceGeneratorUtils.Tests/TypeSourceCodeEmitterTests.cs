@@ -4,145 +4,29 @@ public class TypeSourceCodeEmitterTests
 {
     private static readonly TestTypeGenerationSpec DefaultSpec = new()
     {
+        TestNumber = 1,
         Namespace = "SourceGeneratorUtils.Tests",
-        TypeDeclarations = ImmutableEquatableArray.Create("public class TestType", "public partial class ContainingClass1")
+        TypeDeclarations = ImmutableEquatableArray<string>.Empty
     };
 
     [Fact]
-    public void GetTargetAttributesToApply_ReturnsEmptyEnumerable()
-        => Empty(new TestSourceFileEmitter().GetTargetAttributesToApply(DefaultSpec));
+    public void GetAttributesToApply_ReturnsEmptyEnumerable()
+        => Empty(new ThrowTypeSourceCodeEmitter().GetAttributesToApply(DefaultSpec));
 
     [Fact]
-    public void GetTargetInterfacesToImplement_ReturnsEmptyEnumerable()
-        => Empty(new TestSourceFileEmitter().GetTargetInterfacesToImplement(DefaultSpec));
-
-    [Fact]
-    public void GetTargetAttributesToApply_ReturnsAllSourceCodeWritersAttributes()
-    {
-        var sourceCodeEmitters = new[]
-        {
-            new TestSourceCodeEmitter { AttributesToApply = new [] { "Generate" }},
-            new TestSourceCodeEmitter { AttributesToApply = new [] { "DisplayName(Name = \"test\")" }},
-            new TestSourceCodeEmitter { AttributesToApply = new [] { "TestAttribute" }},
-        };
-
-        var emitter = new TestSourceFileEmitter { SourceCodeEmitters = sourceCodeEmitters };
-
-        var expected = sourceCodeEmitters.SelectMany(e => e.AttributesToApply);
-        Equal(expected, emitter.GetTargetAttributesToApply(DefaultSpec));
-    }
-
-    [Fact]
-    public void GetTargetInterfacesToImplement_ReturnsAllSourceCodeWritersInterfaces()
-    {
-        var sourceCodeEmitters = new[]
-        {
-            new TestSourceCodeEmitter { InterfacesToImplement = new [] { "IInterface" }},
-            new TestSourceCodeEmitter { InterfacesToImplement = new [] { "IGeneric<int>" }},
-            new TestSourceCodeEmitter { InterfacesToImplement = new [] { "ITestInterface" }},
-        };
-
-        var emitter = new TestSourceFileEmitter { SourceCodeEmitters = sourceCodeEmitters };
-
-        var expected = sourceCodeEmitters.SelectMany(e => e.InterfacesToImplement);
-        Equal(expected, emitter.GetTargetInterfacesToImplement(DefaultSpec));
-    }
-
-    [Fact]
-    public void CreateSourceWriter_ShouldIncludeConfiguredGeneratedCodeAttribute()
-    {
-        var localAssemblyName = typeof(DefaultSourceFileEmitterTests).Assembly.GetName();
-        var options = TypeSourceFileEmitterOptions.Default with { AssemblyName = localAssemblyName };
-
-        var emitter = new TestSourceFileEmitter(options);
-        var writer = emitter.CreateSourceWriter(DefaultSpec);
-
-        string expected = $"""[global::System.CodeDom.Compiler.GeneratedCodeAttribute("{options.AssemblyName.Name}", "{options.AssemblyName.Version}")]""";
-        Contains(expected, writer.ToString());
-    }
-
-    [Theory, InlineData(true), InlineData(false)]
-    public void CreateSourceWriter_ShouldIncludeConfiguredDefaultAttributes(bool useCombinedAttributeDeclaration)
-    {
-        var sourceCodeEmitters = new[] { new TestSourceCodeEmitter { AttributesToApply = new[] { "Generate" } } };
-        var options = new TypeSourceFileEmitterOptions
-        {
-            DefaultAttributes = new[] { "TestAttribute" },
-            UseCombinedAttributeDeclaration = useCombinedAttributeDeclaration
-        };
-
-        var emitter = new TestSourceFileEmitter(options) { SourceCodeEmitters = sourceCodeEmitters };
-        var output = emitter.CreateSourceWriter(DefaultSpec).ToString();
-
-        if (useCombinedAttributeDeclaration)
-            Contains("[TestAttribute, Generate]", output);
-        else
-        {
-            Contains("[Generate]", output);
-            Contains("[TestAttribute]", output);
-        }
-    }
-
-    [Theory]
-    [InlineData(null)]
-    [InlineData("BaseType")]
-    public void CreateSourceWriter_ShouldIncludeConfiguredDefaultInterfaces(string? defaultBaseType)
-    {
-        var sourceCodeEmitters = new[] { new TestSourceCodeEmitter { InterfacesToImplement = new[] { "ITestInterface" } } };
-        var options = new TypeSourceFileEmitterOptions
-        {
-            DefaultBaseType = defaultBaseType,
-            DefaultInterfaces = new[] { "IDefaultInterface" },
-        };
-
-        var emitter = new TestSourceFileEmitter(options) { SourceCodeEmitters = sourceCodeEmitters };
-        var output = emitter.CreateSourceWriter(DefaultSpec).ToString();
-
-        if (defaultBaseType is not null)
-            Contains("public class TestType : BaseType, IDefaultInterface, ITestInterface", output);
-        else
-            Contains("public class TestType : IDefaultInterface, ITestInterface", output);
-    }
+    public void GetInterfacesToImplement_ReturnsEmptyEnumerable()
+        => Empty(new ThrowTypeSourceCodeEmitter().GetInterfacesToImplement(DefaultSpec));
 
     private sealed record TestTypeGenerationSpec : AbstractTypeGenerationSpec
     {
-        public string Comment { get; init; } = "Hello There !";
+        public required int TestNumber { get; init; }
     }
 
-    private sealed class TestSourceCodeEmitter : TypeSourceCodeEmitter<TestTypeGenerationSpec>
+    private sealed class ThrowTypeSourceCodeEmitter : TypeSourceCodeEmitter<TestTypeGenerationSpec>
     {
-        public IReadOnlyList<string> AttributesToApply { get; init; } = Array.Empty<string>();
-        public IReadOnlyList<string> InterfacesToImplement { get; init; } = Array.Empty<string>();
-
         public override void EmitTargetSourceCode(TestTypeGenerationSpec target, SourceWriter writer)
         {
-            writer.WriteLine($"// {target.Comment}");
+            throw new NotSupportedException();
         }
-
-        public override IEnumerable<string> GetAttributesToApply(TestTypeGenerationSpec target)
-            => AttributesToApply;
-
-        public override IEnumerable<string> GetInterfacesToImplement(TestTypeGenerationSpec target)
-            => InterfacesToImplement;
-    }
-
-    private sealed class TestSourceFileEmitter : TypeSourceFileEmitter<TestTypeGenerationSpec>
-    {
-        public IReadOnlyList<TypeSourceCodeEmitter<TestTypeGenerationSpec>> SourceCodeEmitters { get; init; }
-            = Array.Empty<TypeSourceCodeEmitter<TestTypeGenerationSpec>>();
-
-
-        public TestSourceFileEmitter(TypeSourceFileEmitterOptions options) : base(options)
-        {
-        }
-
-        public TestSourceFileEmitter() : this(TypeSourceFileEmitterOptions.Default)
-        {
-        }
-
-        public override string GetFileName(TestTypeGenerationSpec target) => string.Empty;
-
-        public override IEnumerable<TypeSourceCodeEmitter<TestTypeGenerationSpec>> GetTypeSourceCodeEmitters()
-            => SourceCodeEmitters;
     }
 }
