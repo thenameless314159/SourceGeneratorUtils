@@ -69,25 +69,24 @@ public abstract class SourceFileEmitterBase<TSpec> : ISourceFileGenerator<TSpec>
     /// </summary>
     /// <param name="target">The target <typeparamref name="TSpec"/> whose header and optional namespace needs to be emitted.</param>
     /// <returns>A <see cref="SourceWriter"/> at the type declaration.</returns>
-    public SourceWriter CreateSourceWriter(TSpec target)
+    public virtual SourceWriter CreateSourceWriter(TSpec target)
     {
         var writer = new SourceWriter();
 
         // Emit the source file header first.
         writer.WriteLine(Options.SourceFileHeader ?? ShortSourcePrefix);
-        writer.WriteLine();
+        writer.WriteEmptyLines(Options.BlankLinesBetweenDeclarations);
 
         // Emit the nullable directive on top.
         writer.WriteLine($"#nullable {EnableOrDisable(Options.EnableNullableAnnotations)} annotations");
         writer.WriteLine($"#nullable {EnableOrDisable(Options.EnableNullableWarnings)} warnings");
-
-        writer.WriteEmptyLines(Options.SpacesBetweenDeclarations);
+        writer.WriteEmptyLines(Options.BlankLinesBetweenDeclarations);
 
         // Suppress any warnings specified in options.
         if (Options.SuppressWarnings.Count > 0)
         {
             writer.WriteLine($"#pragma warning disable {string.Join(CommaWithSpace, Options.SuppressWarnings)}");
-            writer.WriteEmptyLines(Options.SpacesBetweenDeclarations);
+            writer.WriteEmptyLines(Options.BlankLinesBetweenDeclarations);
         }
 
         // Emit the outer using directives if any.
@@ -100,19 +99,18 @@ public abstract class SourceFileEmitterBase<TSpec> : ISourceFileGenerator<TSpec>
                     .Concat(targetOuterUsingDirectives));
 
             writer.WriteLine(string.Join(Environment.NewLine, outerUsingDirectives));
+            writer.WriteEmptyLines(Options.BlankLinesBetweenDeclarations);
         }
 
         // Emit the namespace declaration if any.
         if (target.Namespace == null) // review: must check global namespace instead
             return writer;
 
-        writer.WriteEmptyLines(Options.SpacesBetweenDeclarations);
-
         // review: should add spacing according to options and what was previously emitted
         if (Options.UseFileScopedNamespace) 
             writer
                 .WriteLine($"namespace {target.Namespace};")
-                .WriteEmptyLines(Options.SpacesBetweenDeclarations);
+                .WriteEmptyLines(Options.BlankLinesBetweenDeclarations);
         else writer
                 .WriteLine($"namespace {target.Namespace}")
                 .OpenBlock();
@@ -127,7 +125,7 @@ public abstract class SourceFileEmitterBase<TSpec> : ISourceFileGenerator<TSpec>
                     .Concat(targetInnerUsingDirectives));
 
             writer.WriteLine(string.Join(Environment.NewLine, innerUsingDirectives));
-            writer.WriteEmptyLines(Options.SpacesBetweenDeclarations);
+            writer.WriteEmptyLines(Options.BlankLinesBetweenDeclarations);
         }
 
         return writer;

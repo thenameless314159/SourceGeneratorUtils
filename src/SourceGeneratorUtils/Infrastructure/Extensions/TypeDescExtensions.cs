@@ -1,0 +1,125 @@
+﻿using static SourceGeneratorUtils.WellKnownStrings;
+using static SourceGeneratorUtils.WellKnownChars;
+using System.Text;
+
+namespace SourceGeneratorUtils;
+
+/// <summary>
+/// Provides extension methods for <see cref="TypeDesc"/>.
+/// </summary>
+public static class TypeDescExtensions
+{
+    /// <summary>
+    /// Gets the type declaration for the given <paramref name="descriptor"/> followed by its containing types declarations.
+    /// </summary>
+    /// <param name="descriptor">The type descriptor.</param>
+    /// <returns>An enumerable with the target type declaration followed by the containing types declarations.</returns>
+    /// <exception cref="ArgumentNullException"/>
+    public static IEnumerable<string> GetTypeDeclarationWithContainingTypes(this TypeDesc descriptor)
+    {
+        yield return descriptor.ToTypeDeclaration();
+
+        foreach (var containingType in descriptor.ContainingTypes)
+            yield return containingType.ToTypeDeclaration();
+    }
+
+    /// <summary>
+    /// Gets the type name declaration for the given <paramref name="descriptor"/> with generic types if any.
+    /// </summary>
+    /// <param name="descriptor">The type descriptor.</param>
+    /// <returns>The type name with generic types if any.</returns>
+    public static string GetGenericTypeNameDeclaration(this TypeDesc descriptor)
+    {
+        if (descriptor.GenericTypes.Count == 0)
+            return descriptor.Name;
+
+        StringBuilder sb = new();
+        AppendTypeNameDeclaration(descriptor, sb);
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Converts the given <paramref name="descriptor"/> to a type declaration like <c>public class MyClass<T1></T1></c>.
+    /// </summary>
+    /// <param name="descriptor">The type descriptor.</param>
+    /// <returns>A formatted type declaration.</returns>
+    public static string ToTypeDeclaration(this TypeDesc descriptor)
+    {
+        StringBuilder sb = new();
+
+        sb.Append(descriptor.Accessibility.GetAccessibilityString());
+        sb.Append(' ');
+
+        if (!string.IsNullOrEmpty(descriptor.TypeModifier))
+        {
+            sb.Append(descriptor.TypeModifier);
+            sb.Append(' ');
+        }
+
+        sb.Append(descriptor.TypeKind.GetTypeKindString(descriptor.IsRecord));
+        sb.Append(' ');
+
+        AppendTypeNameDeclaration(descriptor, sb);
+
+        bool hasBaseType = descriptor.BaseTypes.Count > 0;
+        bool hasInterfaces = descriptor.Interfaces.Count > 0;
+
+        if (hasBaseType || hasInterfaces)
+            sb.Append(" : ");
+
+        if (hasBaseType)
+            AppendTypeNameDeclaration(descriptor.BaseTypes[0], sb);
+
+        if (!hasInterfaces) 
+            return sb.ToString();
+
+        if (hasBaseType)
+            sb.Append(CommaWithSpace);
+
+        for (int i = 0; i < descriptor.Interfaces.Count; i++)
+        {
+            AppendTypeNameDeclaration(descriptor.Interfaces[i], sb);
+
+            if (i < descriptor.Interfaces.Count - 1)
+            {
+                sb.Append(CommaWithSpace);
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    private static void AppendTypeNameDeclaration(TypeDesc descriptor, StringBuilder sb)
+    {
+        sb.Append(descriptor.Name);
+
+        if (descriptor.GenericTypes.Count > 0)
+        {
+            sb.Append(OpenAngle);
+            AppendGenericTypes(descriptor.GenericTypes, sb);
+            sb.Append(CloseAngle);
+        }
+
+        // review: might need a rework for a non-recursive approach instead
+        static void AppendGenericTypes(IReadOnlyList<TypeDesc> genericTypes, StringBuilder sb)
+        {
+            for (int i = 0; i < genericTypes.Count; i++)
+            {
+                TypeDesc genericType = genericTypes[i];
+                sb.Append(genericType.Name);
+
+                if (genericType.GenericTypes.Count > 0)
+                {
+                    sb.Append(OpenAngle);
+                    AppendGenericTypes(genericType.GenericTypes, sb);
+                    sb.Append(CloseAngle);
+                }
+
+                if (i < genericTypes.Count - 1)
+                {
+                    sb.Append(CommaWithSpace);
+                }
+            }
+        }
+    }
+}

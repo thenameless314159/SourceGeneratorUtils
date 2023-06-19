@@ -12,6 +12,39 @@ public static class RoslynExtensions
     /// </summary>
     /// <param name="type">The type symbol.</param>
     /// <returns>The fully qualified type name.</returns>
-    public static string GetFullyQualifiedName(this ITypeSymbol type) 
+    public static string GetFullyQualifiedAssemblyName(this ITypeSymbol type) 
         => type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+    /// <summary>
+    /// Gets the <paramref name="accessibility"/> in a C# qualified style.
+    /// </summary>
+    /// <param name="accessibility">The accessibility.</param>
+    /// <returns>The fully qualified accessibility.</returns>
+    public static string GetAccessibilityString(this Accessibility accessibility) => accessibility switch
+    {
+        Accessibility.ProtectedAndInternal => "protected internal",
+        Accessibility.Protected => "protected",
+        Accessibility.Internal => "internal",
+        Accessibility.Private => "private",
+        Accessibility.Public => "public",
+        _ => throw new ArgumentOutOfRangeException(nameof(accessibility), accessibility, null)
+    };
+
+    /// <summary>
+    /// Gets the <paramref name="typeKind"/> in a C# qualified style.
+    /// </summary>
+    /// <param name="typeKind">The type kind.</param>
+    /// <param name="isRecord">Whether the type is a record.</param>
+    /// <returns>The <paramref name="typeKind"/> in a fully qualified style.</returns>
+    /// <exception cref="ArgumentOutOfRangeException"/>
+    public static string GetTypeKindString(this TypeKind typeKind, bool isRecord = false) => typeKind switch
+    {
+        TypeKind.Class when isRecord => "record",
+        TypeKind.Class when !isRecord => "class",
+        TypeKind.Enum => "enum",
+        TypeKind.Interface => "interface",
+        TypeKind.Struct or TypeKind.Structure when isRecord => "record struct",
+        TypeKind.Struct or TypeKind.Structure when !isRecord => "struct",
+        _ => throw new ArgumentOutOfRangeException(nameof(typeKind), typeKind, null)
+    };
 }

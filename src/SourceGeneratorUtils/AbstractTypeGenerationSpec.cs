@@ -1,8 +1,9 @@
 ﻿namespace SourceGeneratorUtils;
 
 /// <summary>
-/// A basic abstractions that must be implemented with relevant members for your source generation logic
-/// in order to models common specifications for generated source code.
+/// A basic abstractions that contains an <see cref="ImmutableEquatableArray{T}"/> of type declarations string to implement in order
+/// to use it in <see cref="TypeSourceFileEmitter{TSpec}"/>.
+/// A default implementation is provided as <see cref="DefaultGenerationSpec"/>.
 /// </summary>
 /// <remarks>
 /// For source generators, type needs to be cacheable as a Roslyn incremental value so it must be
@@ -18,10 +19,13 @@
 /// When implementing this abstraction and adding new members to the type, please ensure that these properties
 /// are satisfied otherwise you risk breaking incremental caching in your source generator!
 /// </remarks>
-public abstract record AbstractGenerationSpec
+public abstract record AbstractTypeGenerationSpec : AbstractGenerationSpec
 {
     /// <summary>
-    /// Gets or init the namespace of the generated source file.
+    /// Gets a list of type declarations to be used while generating the target type declaration.
     /// </summary>
-    public required string? Namespace { get; init; }
+    /// <remarks>
+    /// The first item in the array (at index 0) must be the target type declaration.
+    /// </remarks>
+    public required ImmutableEquatableArray<string> TypeDeclarations { get; init; }
 }
