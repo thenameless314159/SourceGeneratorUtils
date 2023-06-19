@@ -23,8 +23,6 @@ public static class RoslynExtensions
     public static string GetAccessibilityString(this Accessibility accessibility) => accessibility switch
     {
         Accessibility.ProtectedAndInternal => "protected internal",
-        Accessibility.ProtectedOrInternal => "public", // review: ??
-        Accessibility.NotApplicable => string.Empty,
         Accessibility.Protected => "protected",
         Accessibility.Internal => "internal",
         Accessibility.Private => "private",
@@ -45,8 +43,8 @@ public static class RoslynExtensions
         TypeKind.Class when !isRecord => "class",
         TypeKind.Enum => "enum",
         TypeKind.Interface => "interface",
-        TypeKind.Struct when isRecord => "record struct",
-        TypeKind.Struct when !isRecord => "struct",
+        TypeKind.Struct or TypeKind.Structure when isRecord => "record struct",
+        TypeKind.Struct or TypeKind.Structure when !isRecord => "struct",
         _ => throw new ArgumentOutOfRangeException(nameof(typeKind), typeKind, null)
     };
 }

@@ -56,12 +56,12 @@ public sealed class TypeDesc : ITypeDescriptor, IEquatable<TypeDesc>
     /// <summary>
     /// Gets or init the type attributes.
     /// </summary>
-    public ImmutableEquatableArray<string> Attributes { get; init; } = ImmutableEquatableArray<string>.Empty;
+    public ImmutableEquatableArray<TypeDesc> Attributes { get; init; } = ImmutableEquatableArray<TypeDesc>.Empty;
 
     /// <summary>
     /// Gets or init the type interfaces.
     /// </summary>
-    public ImmutableEquatableArray<string> Interfaces { get; init; } = ImmutableEquatableArray<string>.Empty;
+    public ImmutableEquatableArray<TypeDesc> Interfaces { get; init; } = ImmutableEquatableArray<TypeDesc>.Empty;
 
     /// <summary>
     /// Gets or init the type base types.

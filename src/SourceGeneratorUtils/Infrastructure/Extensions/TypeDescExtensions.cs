@@ -24,6 +24,21 @@ public static class TypeDescExtensions
     }
 
     /// <summary>
+    /// Gets the type name declaration for the given <paramref name="descriptor"/> with generic types if any.
+    /// </summary>
+    /// <param name="descriptor">The type descriptor.</param>
+    /// <returns>The type name with generic types if any.</returns>
+    public static string GetGenericTypeNameDeclaration(this TypeDesc descriptor)
+    {
+        if (descriptor.GenericTypes.Count == 0)
+            return descriptor.Name;
+
+        StringBuilder sb = new();
+        AppendTypeNameDeclaration(descriptor, sb);
+        return sb.ToString();
+    }
+
+    /// <summary>
     /// Converts the given <paramref name="descriptor"/> to a type declaration like <c>public class MyClass<T1></T1></c>.
     /// </summary>
     /// <param name="descriptor">The type descriptor.</param>
@@ -32,12 +47,8 @@ public static class TypeDescExtensions
     {
         StringBuilder sb = new();
 
-        string accessibility = descriptor.Accessibility.GetAccessibilityString();
-        if (!string.IsNullOrEmpty(descriptor.TypeModifier))
-        {
-            sb.Append(accessibility);
-            sb.Append(' ');
-        }
+        sb.Append(descriptor.Accessibility.GetAccessibilityString());
+        sb.Append(' ');
 
         if (!string.IsNullOrEmpty(descriptor.TypeModifier))
         {
@@ -48,12 +59,56 @@ public static class TypeDescExtensions
         sb.Append(descriptor.TypeKind.GetTypeKindString(descriptor.IsRecord));
         sb.Append(' ');
 
+        AppendTypeNameDeclaration(descriptor, sb);
+
+        bool hasSemiColonBeenAdded = false;
+        if (descriptor.BaseTypes.Count > 0)
+        {
+            if (!hasSemiColonBeenAdded)
+            {
+                sb.Append(" : ");
+                hasSemiColonBeenAdded = true;
+            }
+
+            AppendTypeNameDeclaration(descriptor.BaseTypes[0], sb);
+        }
+
+        if (descriptor.Interfaces.Count > 0)
+        {
+            if (!hasSemiColonBeenAdded)
+            {
+                sb.Append(" : ");
+            }
+            else
+            {
+                if (descriptor.BaseTypes.Count > 0)
+                    sb.Append(CommaWithSpace);
+            }
+
+            for (int i = 0; i < descriptor.Interfaces.Count; i++)
+            {
+                AppendTypeNameDeclaration(descriptor.Interfaces[i], sb);
+
+                if (i < descriptor.Interfaces.Count - 1)
+                {
+                    sb.Append(CommaWithSpace);
+                }
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    private static void AppendTypeNameDeclaration(TypeDesc descriptor, StringBuilder sb)
+    {
         sb.Append(descriptor.Name);
 
         if (descriptor.GenericTypes.Count > 0)
+        {
+            sb.Append(OpenAngle);
             AppendGenericTypes(descriptor.GenericTypes, sb);
-
-        return sb.ToString(); // review: append base types and interfaces as well ? may not be needed
+            sb.Append(CloseAngle);
+        }
 
         // review: might need a rework for a non-recursive approach instead
         static void AppendGenericTypes(IReadOnlyList<TypeDesc> genericTypes, StringBuilder sb)

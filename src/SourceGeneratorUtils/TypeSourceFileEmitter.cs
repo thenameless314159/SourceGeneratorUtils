@@ -104,7 +104,7 @@ public abstract class TypeSourceFileEmitter<TSpec> : SourceFileEmitter<TSpec> wh
 
         // review: may need to add some distinct filters to avoid duplicates.
         string baseTypeWithInterfaces = hasBaseType || hasInterfaces
-            ? SeparatorOrEmpty(baseTargetDeclarationIndex != -1, " : ")
+            ? SeparatorOrEmpty(baseTargetDeclarationIndex == -1, " : ")
                 + (baseType ?? string.Empty)
                 + SeparatorOrEmpty(hasBaseType && hasInterfaces, CommaWithSpace)
                 + interfacesToImplement
@@ -116,6 +116,6 @@ public abstract class TypeSourceFileEmitter<TSpec> : SourceFileEmitter<TSpec> wh
         
         return writer;
 
-        static string SeparatorOrEmpty(bool hasBaseTypeAndInterface, string separator) => hasBaseTypeAndInterface ? separator : string.Empty;
+        static string SeparatorOrEmpty(bool returnSeparator, string separator) => returnSeparator ? separator : string.Empty;
     }
 }
