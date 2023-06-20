@@ -3,6 +3,10 @@ name: Build
 on:
   workflow_call:
     inputs:
+      buildStaticSite:
+        required: false
+        type: boolean
+        default: false
       packNugetPackage:
         required: false
         type: boolean
@@ -49,4 +53,18 @@ jobs:
       with:
         name: nupkg
         path: ./artifacts/**/*.nupkg
+        retention-days: 5
+
+    - name: DocFX Build
+      if: ${{ inputs.buildStaticSite }}
+      run: |
+        dotnet tool update -g docfx
+        docfx ./docs/docfx.json
+
+    - name: Upload artifacts (github pages)
+      if: ${{ inputs.buildStaticSite }}
+      uses: actions/upload-artifact@master
+      with:
+        name: documentation
+        path: ./docs/_site/
         retention-days: 5
