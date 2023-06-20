@@ -28,9 +28,20 @@ jobs:
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v3
-
+      
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
 
       - name: Push to GitHub Packages
         run: dotnet nuget push **/ci/*.nupkg -s https://nuget.pkg.github.com/thenameless314159/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+      
+      - name: DocFX Build
+        run: |
+          dotnet tool update -g docfx
+          docfx ./docs/docfx.json
+
+      - name: Upload Github Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_site
