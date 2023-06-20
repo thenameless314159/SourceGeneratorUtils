@@ -13,6 +13,12 @@ on:
 env:
   PACKAGE_ID: SourceGeneratorUtils
 
+permissions:
+  packages: write
+  contents: read
+  pages: write
+  id-token: write
+
 concurrency:
   group: "pages"
   cancel-in-progress: false
