@@ -12,6 +12,15 @@ on:
 
 env:
   PACKAGE_ID: SourceGeneratorUtils
+  
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -38,8 +47,14 @@ jobs:
       - name: Push to GitHub Packages
         run: dotnet nuget push **/ci/*.nupkg -s https://nuget.pkg.github.com/thenameless314159/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
       
-      - name: Upload Github Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload Pages
+        uses: actions/upload-pages-artifact@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/_site
+          path: './docs/_site/'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
