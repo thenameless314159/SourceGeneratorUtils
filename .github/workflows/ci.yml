@@ -12,11 +12,6 @@ on:
 
 env:
   PACKAGE_ID: SourceGeneratorUtils
-  
-permissions:
-  contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: "pages"
