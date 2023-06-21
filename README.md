@@ -6,7 +6,7 @@
 
 In my journey of implementing [source generators](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview), I noticed recurrent similarities in each project. Handling source generation on nested types, for example, appeared frequently. Rewriting this logic on every source generator felt redundant and time-consuming, prompting me to abstract and manage most of these routine writing tasks. Hence, SourceGeneratorUtils was created. 
 
-The main objective is to enable developers to dive straight into writing the code necessary for their source generators, instead of handling the boilerplate writing logic for namespaces, containing types etc.. With **SourceGeneratorUtils**, users can supply an implementation of [`AbstractGenerationSpec`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/AbstractGenerationSpec.cs) that could be mapped from Roslyn's [`ISymbol`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.isymbol?view=roslyn-dotnet-4.6.0) (for source generators) or some parsed files with type definitions (for general purpose). Users can then focus on implementing [`SourceCodeEmitter<TSpec>`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceCodeEmitter.cs)s with logic specific to the target code to generate.
+The main objective is to enable developers to dive straight into writing the code necessary for their source generators, instead of handling the boilerplate writing logic for namespaces, containing types etc.. With **SourceGeneratorUtils**, users can supply an implementation of [`AbstractGenerationSpec`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/AbstractGenerationSpec.cs) (or [`AbstractTypeGenerationSpec`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/AbstractTypeGenerationSpec.cs)) that could be mapped from Roslyn's [`ISymbol`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.isymbol?view=roslyn-dotnet-4.6.0) (for source generators) or some parsed files with type definitions (for general purpose). Users can then focus on implementing [`SourceCodeEmitter<TSpec>`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceCodeEmitter.cs)s components (used by [`SourceFileEmitter<TSpec>`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceFileEmitter.cs)s and [`TypeSourceFileEmitter<TSpec>`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/TypeSourceFileEmitter.cs)s with logic specific to the target code to generate.
 
 # Installation
 In order to **import** this library in your [source generators](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview), some small tweaks are required. Full details can be found on [this repository's detailed documentation](https://thenameless314159.github.io/SourceGeneratorUtils/articles/install.html).
@@ -30,9 +30,10 @@ You'll need your own *Github Personal Access Token* (PAT) in order to access the
 2. You should now be able to add a reference to the package specifying a version from the [repository packages feed](https://github.com/thenameless314159/SourceGeneratorUtils/pkgs/nuget/SourceGeneratorUtils)
 
 # Getting started
-Comprehensive documentation, along with illustrative examples (for the provided abstractions), is currently in progress and will be available soon.
 
-An article explaining the default implementation usage is available on [this repository's detailed documentation](https://thenameless314159.github.io/SourceGeneratorUtils/articles/usage.html).
+**An article** explaining the **default implementation usage** is available on [this repository's detailed documentation](https://thenameless314159.github.io/SourceGeneratorUtils/articles/usage.html).
+
+Comprehensive documentation, along with illustrative examples (for the provided abstractions), is currently in progress and will be available soon.
 
 # Acknowledgements
 - I would like to thank [Damian Edwards](https://github.com/DamianEdwards) for the inspiration I drew from his CI workflows.
