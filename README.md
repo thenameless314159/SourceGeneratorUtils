@@ -35,6 +35,17 @@ You'll need your own *Github Personal Access Token* (PAT) in order to access the
 
 Comprehensive documentation, along with illustrative examples (for the provided abstractions), is currently in progress and will be available soon.
 
+## What's Included?
+This library provides a variety of types that help the conception of source generation logic :
+
+- [`SourceWriter`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceWriter.cs) - A minimal wrapper over StringBuilder, it handles indentation in a straightforward manner.
+- [`SourceBuilder`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceBuilder.cs) - Another thin wrapper, this time over a dictionary, to store generated source files and export them to disk. The following type can populate it:
+- [`SourceFileEmitterBase<TSpec>`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceFileEmitterBase.cs) - Encapsulates all the necessary logic to write a C# source file ready for compilation.
+- [`SourceCodeEmitter<TSpec>`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceCodeEmitter.cs) - An abstraction that allows developers to break down their source generation logic into smaller components. It is used by [`SourceFileEmitter<TSpec>`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceFileEmitter.cs) to write the source file. This is the main abstraction that users should implement to write their own source generation logic.
+- [`SourceFileEmitterOptions`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceFileEmitterOptions.cs) - A simple record that holds options for source file generation within a `SourceFileEmitterBase<TSpec>`.
+- [`TypeSourceFileEmitter`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/TypeSourceFileEmitter.cs) - A configurable abstraction that takes care of everything up until the target type body declaration.
+- [`TypeSourceFileEmitterOptions`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/TypeSourceFileEmitterOptions.cs) - A simple record that holds options for source file generation within a `TypeSourceFileEmitter<TSpec>`.
+
 # Acknowledgements
 - I would like to thank [Damian Edwards](https://github.com/DamianEdwards) for the inspiration I drew from his CI workflows.
 - Gratitude is also extended to the individual who wrote [`SourceWriter`](https://github.com/dotnet/runtime/blob/main/src/libraries/System.Text.Json/gen/Helpers/SourceWriter.cs) at Microsoft and all the team behind the [`System.Text.Json`](https://github.com/dotnet/runtime/tree/main/src/libraries/System.Text.Json/gen) source generator.
