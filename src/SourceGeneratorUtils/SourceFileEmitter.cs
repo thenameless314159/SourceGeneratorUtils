@@ -157,11 +157,8 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
         if (targetTypeDeclarationHeader != null)
             writer.WriteLine(targetTypeDeclarationHeader);
 
-        IReadOnlyList<string> targetAttributesToApply = Options.AssemblyName != null
-            ? GetTargetAttributesToApply(target).Append($"global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"{Options.AssemblyName.Name}\", \"{Options.AssemblyName.Version}\")").ToList()
-            : GetTargetAttributesToApply(target).ToList();
-
         // Apply the attributes on the target class if any.
+        IReadOnlyList<string> targetAttributesToApply = GetTargetAttributesToApply(target).ToList();
         if (Options.DefaultAttributes.Count > 0 || targetAttributesToApply.Count > 0)
         {
             IEnumerable<string> attributes = Options.DefaultAttributes.Concat(targetAttributesToApply);
@@ -222,7 +219,10 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
     /// <param name="target">The target <typeparamref name="TSpec"/>.</param>
     /// <returns>A list of the additional attributes.</returns>
     public virtual IEnumerable<string> GetTargetAttributesToApply(TSpec target)
-        => SourceCodeEmitters.SelectMany(e => e.GetAttributesToApply(target));
+        => Options.AssemblyName != null
+            ? SourceCodeEmitters.SelectMany(e => e.GetAttributesToApply(target))
+                .Append($"global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"{Options.AssemblyName.Name}\", \"{Options.AssemblyName.Version}\")")
+            : SourceCodeEmitters.SelectMany(e => e.GetAttributesToApply(target));
 
     /// <summary>
     /// Allows to specify additional interfaces to implements based on the target <typeparamref name="TSpec"/>.
