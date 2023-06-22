@@ -5,32 +5,35 @@ namespace SourceGeneratorUtils.Tests;
 
 public class DefaultSourceFileEmitterTests
 {
-    private static readonly TypeDesc DefaultTypeDesc = new()
-    {
-        Accessibility = Accessibility.Public,
-        Namespace = "SourceGeneratorUtils.Tests",
-        Name = "TestClass",
-        TypeKind = TypeKind.Class,
-        IsRecord = false,
-        TypeModifier = null,
-        IsValueType = false,
-        SpecialType = SpecialType.None
-    };
+    private static readonly TypeDesc DefaultTypeDesc = TypeDesc.Create
+    (
+        "TestClass",
+        typeKind: TypeKind.Class,
+        accessibility: Accessibility.Public,
+        @namespace: "SourceGeneratorUtils.Tests"
+    );
 
     [Fact]
     public void GenerateSource_ShouldIncludeTypeDeclarationsAndBody_WithTargetAttributesAndInterfaces()
     {
-        var sourceCodeEmitters = new[] { new TestSourceCodeEmitter 
-            { AttributesToApply = new [] { "Generated" }, InterfacesToImplement = new [] { "ITestInterface" } }
+        var sourceCodeEmitters = new[] 
+        { 
+            new TestSourceCodeEmitter {
+                AttributesToApply = new [] { "Generated" }, 
+                InterfacesToImplement = new [] { "ITestInterface" }
+            }
         };
 
-        TypeDesc targetTypeDesc = new() {
-            TypeKind = TypeKind.Class, IsRecord = false, TypeModifier = null, IsValueType = false, SpecialType = SpecialType.None,
-            ContainingTypes = ImmutableEquatableArray.Create(DefaultTypeDesc),
-            Accessibility = Accessibility.Public,
-            Namespace = "SourceGeneratorUtils.Tests",
-            Name = "TestType",
-        };
+        TypeDesc targetTypeDesc = TypeDesc.Create
+        (
+            "TestType",
+            isRecord: true,
+            isValueType: true,
+            typeKind: TypeKind.Struct,
+            accessibility: Accessibility.Public,
+            @namespace: "SourceGeneratorUtils.Tests",
+            containingTypes: new [] { DefaultTypeDesc }
+        );
 
         var emitter = new DefaultSourceFileEmitter(sourceCodeEmitters);
         var sourceFile = emitter.GenerateSource(DefaultGenerationSpec.CreateFrom(targetTypeDesc));
@@ -41,7 +44,7 @@ public class DefaultSourceFileEmitterTests
                 public class TestClass
                 {
                     [Generated]
-                    public class TestType : ITestInterface
+                    public record struct TestType : ITestInterface
                     {
                         // Body for TestType goes here !
                     }

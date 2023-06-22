@@ -13,6 +13,70 @@ public sealed class TypeDesc : ITypeDescriptor, IEquatable<TypeDesc>
     private string? _cachedFullyQualifiedTypeName, _cachedFullyQualifiedAssemblyName;
 
     /// <summary>
+    /// Creates a new <see cref="TypeDesc"/> from the given parameters.
+    /// </summary>
+    /// <param name="name">The name of the type.</param>
+    /// <param name="namespace">The optional namespace of the type.</param>
+    /// <param name="typeKind">The kind of the type.</param>
+    /// <param name="specialType">The special type.</param>
+    /// <param name="accessibility">The type accessibility.</param>
+    /// <param name="isValueType">Whether the type is a value type.</param>
+    /// <param name="isReadOnly">Whether the type is readonly.</param>
+    /// <param name="isAbstract">Whether the type is abstract.</param>
+    /// <param name="isPartial">Whether the type is partial.</param>
+    /// <param name="isRecord">Whether the type is a record.</param>
+    /// <param name="isStatic">Whether the type is static.</param>
+    /// <param name="isSealed">Whether the type is sealed.</param>
+    /// <param name="attributes">The type attributes.</param>
+    /// <param name="baseTypes">The type base types.</param>
+    /// <param name="interfaces">The type interfaces.</param>
+    /// <param name="genericTypes">The type generic types.</param>
+    /// <param name="containingTypes">The type containing types.</param>
+    /// <returns>A new <see cref="TypeDesc"/> with the given parameters.</returns>
+    public static TypeDesc Create
+    (
+        string name,
+        string? @namespace = null,
+        TypeKind typeKind = TypeKind.Unknown,
+        SpecialType specialType = SpecialType.None,
+        Accessibility accessibility = Accessibility.NotApplicable,
+        bool isValueType = false,
+        bool isReadOnly = false,
+        bool isAbstract = false,
+        bool isPartial = false,
+        bool isRecord = false,
+        bool isStatic = false,
+        bool isSealed = false,
+        string[]? attributes = null,
+        TypeDesc[]? baseTypes = null,
+        TypeDesc[]? interfaces = null,
+        TypeDesc[]? genericTypes = null,
+        TypeDesc[]? containingTypes = null
+    ) 
+    => 
+    new()
+    {
+        Name = name,
+        Namespace = @namespace,
+        TypeKind = typeKind,
+        IsRecord = isRecord,
+        IsStatic = isStatic,
+        IsSealed = isSealed,
+        IsPartial = isPartial,
+        IsAbstract = isAbstract,
+        IsReadOnly = isReadOnly,
+        IsValueType = isValueType,
+        SpecialType = specialType,
+        Accessibility = accessibility,
+        Attributes = ImmutableEquatableArray.Create(attributes ?? Array.Empty<string>()),
+        BaseTypes = ImmutableEquatableArray.Create(baseTypes ?? Array.Empty<TypeDesc>()),
+        Interfaces = ImmutableEquatableArray.Create(interfaces ?? Array.Empty<TypeDesc>()),
+        GenericTypes = ImmutableEquatableArray.Create(genericTypes ?? Array.Empty<TypeDesc>()),
+        ContainingTypes = ImmutableEquatableArray.Create(containingTypes ?? Array.Empty<TypeDesc>()),
+        
+    };
+
+    /// <summary>
     /// Gets or init the type name.
     /// </summary>
     public required string Name { get; init; }
@@ -28,15 +92,34 @@ public sealed class TypeDesc : ITypeDescriptor, IEquatable<TypeDesc>
     public required bool IsValueType { get; init; }
 
     /// <summary>
+    /// Gets or init whether the type has a readonly modifier.
+    /// </summary>
+    public required bool IsReadOnly { get; init; }
+
+    /// <summary>
+    /// Gets or init whether the type has an abstract modifier.
+    /// </summary>
+    public required bool IsAbstract { get; init; }
+
+    /// <summary>
+    /// Gets or init whether the type has a partial modifier.
+    /// </summary>
+    public required bool IsPartial { get; init; }
+    
+    /// <summary>
     /// Gets or init whether the type is a record.
     /// </summary>
     public required bool IsRecord { get; init; }
 
     /// <summary>
-    /// Gets or init the type modifier (sealed, unsafe, partial...).
+    /// Gets or init whether the type has a static modifier.
     /// </summary>
-    // review: may make an enum out of it
-    public required string? TypeModifier { get; init; }
+    public required bool IsStatic { get; init; }
+
+    /// <summary>
+    /// Gets or init whether the type has a sealed modifier.
+    /// </summary>
+    public required bool IsSealed { get; init; }
 
     /// <summary>
     /// Gets or init the type kind.
@@ -56,7 +139,10 @@ public sealed class TypeDesc : ITypeDescriptor, IEquatable<TypeDesc>
     /// <summary>
     /// Gets or init the type attributes.
     /// </summary>
-    public ImmutableEquatableArray<TypeDesc> Attributes { get; init; } = ImmutableEquatableArray<TypeDesc>.Empty;
+    /// <remarks>
+    /// This is a string unlike other members because we want to allow for arbitrary attributes with parameters.
+    /// </remarks>
+    public ImmutableEquatableArray<string> Attributes { get; init; } = ImmutableEquatableArray<string>.Empty;
 
     /// <summary>
     /// Gets or init the type interfaces.
@@ -69,11 +155,6 @@ public sealed class TypeDesc : ITypeDescriptor, IEquatable<TypeDesc>
     public ImmutableEquatableArray<TypeDesc> BaseTypes { get; init; } = ImmutableEquatableArray<TypeDesc>.Empty;
 
     /// <summary>
-    /// Gets or init the type nested types.
-    /// </summary>
-    public ImmutableEquatableArray<TypeDesc> NestedTypes { get; init; } = ImmutableEquatableArray<TypeDesc>.Empty;
-
-    /// <summary>
     /// Gets or init the type generic types.
     /// </summary>
     public ImmutableEquatableArray<TypeDesc> GenericTypes { get; init; } = ImmutableEquatableArray<TypeDesc>.Empty;
@@ -82,11 +163,6 @@ public sealed class TypeDesc : ITypeDescriptor, IEquatable<TypeDesc>
     /// Gets or init the type containing types.
     /// </summary>
     public ImmutableEquatableArray<TypeDesc> ContainingTypes { get; init; } = ImmutableEquatableArray<TypeDesc>.Empty;
-
-    /// <summary>
-    /// Gets or init the type members.
-    /// </summary>
-    public ImmutableEquatableArray<TypeMemberDesc> TypeMembers { get; init; } = ImmutableEquatableArray<TypeMemberDesc>.Empty;
 
     /// <inheritdoc/>
     public string FullyQualifiedName => FullyQualifiedAssemblyName;
@@ -112,17 +188,19 @@ public sealed class TypeDesc : ITypeDescriptor, IEquatable<TypeDesc>
         && Name == other.Name
         && Namespace == other.Namespace
         && IsValueType == other.IsValueType
+        && IsReadOnly == other.IsReadOnly
+        && IsAbstract == other.IsAbstract
+        && IsPartial == other.IsPartial
+        && IsStatic == other.IsStatic
+        && IsSealed == other.IsSealed
         && IsRecord == other.IsRecord
         && TypeKind == other.TypeKind
-        && TypeModifier == other.TypeModifier
         && Accessibility == other.Accessibility
         && Attributes.Equals(other.Attributes)
         && Interfaces.Equals(other.Interfaces)
         && BaseTypes.Equals(other.BaseTypes)
-        && NestedTypes.Equals(other.NestedTypes)
         && GenericTypes.Equals(other.GenericTypes)
-        && ContainingTypes.Equals(other.ContainingTypes)
-        && TypeMembers.Equals(other.TypeMembers);
+        && ContainingTypes.Equals(other.ContainingTypes);
 
     /// <inheritdoc/>
     public bool Equals(ITypeDescriptor? other) => (other is TypeDesc typeDesc && Equals(typeDesc))
@@ -138,7 +216,13 @@ public sealed class TypeDesc : ITypeDescriptor, IEquatable<TypeDesc>
     ( 
         Name,
         Namespace,
-        TypeModifier,
+        IsValueType,
+        IsReadOnly,
+        IsAbstract,
+        IsPartial,
+        IsStatic,
+        IsSealed,
+        IsRecord,
         TypeKind,
         IsRecord,
         IsValueType,
@@ -146,10 +230,8 @@ public sealed class TypeDesc : ITypeDescriptor, IEquatable<TypeDesc>
         Attributes,
         Interfaces,
         BaseTypes,
-        NestedTypes,
         GenericTypes,
-        ContainingTypes,
-        TypeMembers
+        ContainingTypes
     ).GetHashCode();
 
     /// <inheritdoc/>

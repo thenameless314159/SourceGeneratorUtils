@@ -41,19 +41,47 @@ public class TypeDescExtensionsTests
     [InlineData(Accessibility.ProtectedAndInternal)]
     public void ToTypeDeclaration_ShouldStartsWithAccessibility(Accessibility accessibility)
     {
-        var typeDeclaration = Create("TestClass", accessibility: accessibility).ToTypeDeclaration();
+        string typeDeclaration = Create("TestClass", accessibility: accessibility).ToTypeDeclaration();
         StartsWith(accessibility.GetAccessibilityString(), typeDeclaration);
+    }
+
+    [Fact]
+    public void GetTypeModifiersDeclaration_ReturnsEmptyStringWhenNoModifiers()
+    {
+        string typeDeclaration = Create("TestClass").GetTypeModifiersDeclaration();
+        True(string.IsNullOrWhiteSpace(typeDeclaration));
+    }
+
+    [Fact]
+    public void GetTypeModifiersDeclaration_ReturnsStaticModifierWithPartialIfPresent()
+    {
+        string typeDeclaration = Create("TestClass", isStatic: true, isPartial: true).GetTypeModifiersDeclaration();
+        Equal("static partial ", typeDeclaration);
     }
 
     [Theory]
     [InlineData(null)]
     [InlineData("sealed")]
-    [InlineData("partial sealed")]
+    [InlineData("static")]
+    [InlineData("readonly")]
+    [InlineData("abstract")]
+    [InlineData("sealed partial")]
+    [InlineData("static partial")]
     public void ToTypeDeclaration_ShouldIncludeOptionalModifiers(string? modifiers)
     {
-        var typeDeclaration = Create("TestClass", modifier: modifiers).ToTypeDeclaration();
+        bool isStruct = modifiers?.Contains("readonly") ?? false;
+        var typeDeclaration = Create("TestClass", accessibility: Accessibility.Public,
+            kind: isStruct ? TypeKind.Struct : TypeKind.Class,
+            isReadOnly: isStruct, isValueType: isStruct,
+            isSealed: modifiers?.Contains("sealed") ?? false,
+            isStatic: modifiers?.Contains("static") ?? false,
+            isPartial: modifiers?.Contains("partial") ?? false,
+            isAbstract: modifiers?.Contains("abstract") ?? false
+            )
+            .ToTypeDeclaration();
+
         if (modifiers is not null) Contains(modifiers, typeDeclaration);
-        else Equal("public class TestClass", typeDeclaration);
+        else Equal($"public {(isStruct ? "struct" : "class")} TestClass", typeDeclaration);
     }
 
     [Theory]
@@ -129,33 +157,30 @@ public class TypeDescExtensionsTests
     }
 
     private static TypeDesc Create(string name, 
-        string? ns = null, 
-        string? modifier = null, 
-        bool isValueType = false, 
+        string? ns = null,
+        bool isValueType = false,
+        bool isReadOnly = false,
+        bool isAbstract = false,
+        bool isPartial = false,
         bool isRecord = false,
+        bool isStatic = false,
+        bool isSealed = false,
         TypeDesc? baseType = null,
         TypeKind kind = TypeKind.Class, 
         SpecialType specialType = SpecialType.None,
         Accessibility accessibility = Accessibility.Public,
+        IEnumerable<string>? attributes = null,
         IEnumerable<TypeDesc>? interfaces = null,
         IEnumerable<TypeDesc>? genericTypes = null,
         IEnumerable<TypeDesc>? containingTypes = null
         )
-        => new()
-        {
-            Name = name,
-            Namespace = ns,
-            TypeKind = kind,
-            IsRecord = isRecord,
-            TypeModifier = modifier,
-            IsValueType = isValueType,
-            SpecialType = specialType,
-            Accessibility = accessibility,
-            Interfaces = new ImmutableEquatableArray<TypeDesc>(interfaces ?? Array.Empty<TypeDesc>()),
-            GenericTypes = new ImmutableEquatableArray<TypeDesc>(genericTypes ?? Array.Empty<TypeDesc>()),
-            ContainingTypes = new ImmutableEquatableArray<TypeDesc>(containingTypes ?? Array.Empty<TypeDesc>()),
-            BaseTypes = baseType is not null ? ImmutableEquatableArray.Create(baseType) : ImmutableEquatableArray<TypeDesc>.Empty,
-        };
+        => TypeDesc.Create(name, ns, kind, specialType, accessibility, isValueType, isReadOnly, isAbstract, isPartial, isRecord, isStatic, isSealed,
+            attributes?.ToArray() ?? Array.Empty<string>(),
+            baseType is not null ? new []{ baseType } : Array.Empty<TypeDesc>(),
+            interfaces?.ToArray() ?? Array.Empty<TypeDesc>(),
+            genericTypes?.ToArray() ?? Array.Empty<TypeDesc>(),
+            containingTypes?.ToArray() ?? Array.Empty<TypeDesc>()
+        );
 
     private static readonly TypeDesc _genericTypeDesc = Create("Generic", genericTypes: new[]
     {

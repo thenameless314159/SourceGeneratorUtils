@@ -20,6 +20,15 @@ public class SourceFileEmitterTests
     public void TestSourceCodeEmitter_Options_GetShouldThrowIfNotSetup()
         => Throws<InvalidOperationException>(() => new TestSourceCodeEmitter().Options);
 
+    [Fact]
+    public void Ctor_CreateSourceFileEmitterWithEmptySourceCodeEmittersAndDefaultOptions()
+    {
+        var emitter = new TestSourceFileEmitter();
+
+        Empty(emitter.SourceCodeEmitters);
+        Equal(SourceFileEmitterOptions.Default, emitter.Options);
+    }
+
     [Theory, InlineData(true), InlineData(false)]
     public void Ctor_ShouldSetupOptionsOnSourceCodeWritersIfNone(bool optionAlreadySetup)
     {
@@ -31,6 +40,26 @@ public class SourceFileEmitterTests
 
         if (optionAlreadySetup) NotEqual(SourceFileEmitterOptions.Default, emitter.SourceCodeEmitters.First().Options);
         else Equal(SourceFileEmitterOptions.Default, emitter.SourceCodeEmitters.First().Options);
+    }
+
+    [Fact]
+    public void Ctor_ShouldNotSetupOptionsOnSourceCodeWritersIfOptionsAreFalse()
+    {
+        SourceFileEmitterOptions options = new() { InjectOptionsOnCodeEmitters = false };
+        var sourceCodeEmitters = new[] { new TestSourceCodeEmitter() };
+        
+        var emitter = new TestSourceFileEmitter(options, sourceCodeEmitters);
+        Throws<InvalidOperationException>(() => emitter.SourceCodeEmitters.First().Options);
+    }
+
+    [Fact]
+    public void SourceCodeWriters_Init_ShouldNotSetupOptionsOnSourceCodeWritersIfOptionsAreFalse()
+    {
+        SourceFileEmitterOptions options = new() { InjectOptionsOnCodeEmitters = false };
+        var sourceCodeEmitters = new[] { new TestSourceCodeEmitter() };
+
+        var emitter = new TestSourceFileEmitter(options) { SourceCodeEmitters = sourceCodeEmitters };
+        Throws<InvalidOperationException>(() => emitter.SourceCodeEmitters.First().Options);
     }
 
     [Theory, InlineData(true), InlineData(false)]
@@ -261,6 +290,10 @@ public class SourceFileEmitterTests
         }
 
         public TestSourceFileEmitter(SourceFileEmitterOptions options) : base(options)
+        {
+        }
+
+        public TestSourceFileEmitter()
         {
         }
 

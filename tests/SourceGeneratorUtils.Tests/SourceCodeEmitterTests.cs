@@ -9,6 +9,21 @@ public class SourceCodeEmitterTests
         TypeDeclarations = ImmutableEquatableArray<string>.Empty
     };
 
+    [Fact]
+    public void Ctor_Default_CreateInstanceWithNullOptions()
+    {
+        var emitter = new ThrowTypeSourceCodeEmitter();
+
+        Throws<InvalidOperationException>(() => emitter.Options);
+    }
+
+    [Fact]
+    public void Ctor_Options_CreateInstanceWithSpecifiedOptions()
+    {
+        var emitter = new ThrowTypeSourceCodeEmitter(SourceFileEmitterOptions.Default);
+        Same(SourceFileEmitterOptions.Default, emitter.Options);
+    }
+
     [Fact] public void GetOuterUsingDirectives_ReturnsEmptyEnumerable()
         => Empty(new ThrowTypeSourceCodeEmitter().GetOuterUsingDirectives(DefaultSpec));
 
@@ -28,6 +43,14 @@ public class SourceCodeEmitterTests
 
     private sealed record ThrowTypeSourceCodeEmitter : SourceCodeEmitter<TestTypeGenerationSpec>
     {
+        public ThrowTypeSourceCodeEmitter(SourceFileEmitterOptions options) : base(options)
+        {
+        }
+
+        public ThrowTypeSourceCodeEmitter()
+        {
+        }
+
         public override void EmitTargetSourceCode(TestTypeGenerationSpec target, SourceWriter writer)
         {
             throw new NotSupportedException();

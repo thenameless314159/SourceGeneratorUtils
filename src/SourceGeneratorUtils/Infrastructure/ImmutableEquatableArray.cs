@@ -28,7 +28,7 @@ public sealed class ImmutableEquatableArray<T> : IEquatable<ImmutableEquatableAr
     /// </summary>
     /// <param name="values">The values.</param>
     public ImmutableEquatableArray(IEnumerable<T> values)
-        => _values = values.ToArray();
+        => _values = values as T[] ?? values.ToArray();
 
     /// <inheritdoc/>
     public bool Equals(ImmutableEquatableArray<T>? other)
