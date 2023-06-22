@@ -148,18 +148,20 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
         string targetDeclaration = specClasses[0];
         Debug.Assert(!string.IsNullOrWhiteSpace(targetDeclaration));
 
-        int lastIndexOfNewLine = targetDeclaration.LastIndexOf('\n');
-        bool targetEmbedDocumentation = targetDeclaration[0] == '/';
+        int lastIndexOfNewLine = targetDeclaration.LastIndexOf(Environment.NewLine, StringComparison.InvariantCulture);
+        string? targetTypeDeclarationHeader = lastIndexOfNewLine != -1
+            ? targetDeclaration[..lastIndexOfNewLine]
+            : null;
 
-        string targetTypeDeclaration = targetEmbedDocumentation
-            ? targetDeclaration[(lastIndexOfNewLine + 1)..]
-            : targetDeclaration;
+        // Emit the target type declaration header.
+        if (targetTypeDeclarationHeader != null)
+            writer.WriteLine(targetTypeDeclarationHeader);
 
-        // Apply the attributes on the target class if any.
         IReadOnlyList<string> targetAttributesToApply = Options.AssemblyName != null
             ? GetTargetAttributesToApply(target).Append($"global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"{Options.AssemblyName.Name}\", \"{Options.AssemblyName.Version}\")").ToList()
             : GetTargetAttributesToApply(target).ToList();
 
+        // Apply the attributes on the target class if any.
         if (Options.DefaultAttributes.Count > 0 || targetAttributesToApply.Count > 0)
         {
             IEnumerable<string> attributes = Options.DefaultAttributes.Concat(targetAttributesToApply);
@@ -167,8 +169,12 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
                 ? string.Join(Environment.NewLine, attributes.Select(static a => $"[{a}]"))
                 : $"[{string.Join(", ", attributes)}]";
 
-            targetTypeDeclaration =  attributesToApply + Environment.NewLine + targetTypeDeclaration;
+            writer.WriteLine(attributesToApply);
         }
+        
+        string targetTypeDeclaration = lastIndexOfNewLine != -1
+            ? targetDeclaration[(lastIndexOfNewLine + 1)..]
+            : targetDeclaration;
 
         // The target doesn't have any declared base type
         if (targetTypeDeclaration.IndexOf(':') == -1)
@@ -180,44 +186,18 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
                 ? $" : {Options.DefaultBaseType ?? string.Empty}{SeparatorOrEmpty(hasBoth, CommaWithSpace)}{interfacesToImplement}"
                 : string.Empty;
 
-            targetDeclaration = GetTargetDeclaration(targetDeclaration, 
-                $"{targetTypeDeclaration}{baseTypeWithInterfaces}", 
-                targetEmbedDocumentation);
-        }
-        else
-        {
-            // review: may check later whether the already declared base is an interface or not but how ?
-            //         Some non-interfaces types may start with the letter I like Index or ImmutableArray...
-            targetDeclaration = GetTargetDeclaration(targetDeclaration, 
-                $"{targetTypeDeclaration}{SeparatorOrEmpty(hasInterfacesToImplement, CommaWithSpace)}{interfacesToImplement}", 
-                targetEmbedDocumentation);
+            writer.WriteLine($"{targetTypeDeclaration}{baseTypeWithInterfaces}");
+            writer.OpenBlock();
+            return writer;
         }
 
         // Emit the target class declaration with interfaces only.
-        writer.WriteLine(targetDeclaration);
+        writer.WriteLine($"{targetTypeDeclaration}{interfacesToImplement}");
         writer.OpenBlock();
 
         return writer;
 
         static string SeparatorOrEmpty(bool returnSeparator, string separator) => returnSeparator ? separator : string.Empty;
-        static string GetTargetDeclaration(string targetDeclaration, string typeDeclaration, bool embedDocumentation)
-        {
-            if (typeDeclaration == targetDeclaration) // return self if equal
-                return targetDeclaration;
-
-            if (!embedDocumentation) // return the formatted declaration if no documentation
-                return typeDeclaration;
-
-            // Otherwise, return the formatted declaration with the documentation
-            int lastIndexOfNewLine = targetDeclaration.LastIndexOf('\n');
-
-            return targetDeclaration[lastIndexOfNewLine - 1] switch
-            {
-                // target has attributes
-                ']' => targetDeclaration[..(targetDeclaration.IndexOf('[') - 1)] + typeDeclaration,
-                _ => targetDeclaration[..(lastIndexOfNewLine + 1)] + typeDeclaration
-            };
-        }
     }
 
     /// <summary>

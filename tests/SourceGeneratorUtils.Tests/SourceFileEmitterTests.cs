@@ -191,35 +191,32 @@ public class SourceFileEmitterTests
         };
 
         var writer = emitter.CreateSourceWriter(spec);
+        int indentCount = writer.Indentation - 1;
 
         string attribute = $"""[global::System.CodeDom.Compiler.GeneratedCodeAttribute("{options.AssemblyName.Name}", "{options.AssemblyName.Version}")]""";
-        string target = GetTypeDeclaration(typeDeclaration, out string additionalAttributes);
 
-        additionalAttributes = additionalAttributes != string.Empty 
-            ? Environment.NewLine + Indent(writer.Indentation - 1) + additionalAttributes
-            : additionalAttributes;
+        int lastIndexOfNewLine = typeDeclaration.LastIndexOf(Environment.NewLine, StringComparison.InvariantCulture);
+        string? typeDeclarationHeader = lastIndexOfNewLine != -1
+            ? typeDeclaration[..lastIndexOfNewLine]
+            : null;
+
+        string targetTypeDeclaration = lastIndexOfNewLine != -1
+            ? typeDeclaration[(lastIndexOfNewLine + 1)..]
+            : typeDeclaration;
+
+        var expectedWriter = new SourceWriter();
+        expectedWriter.Indentation = indentCount;
+        if (typeDeclarationHeader != null)
+        {
+            expectedWriter.WriteLine(typeDeclarationHeader);
+        }
         
-        string expected = $"""
-            {additionalAttributes}{Indent(writer.Indentation - 1)}[TestAttribute]
-            {Indent(writer.Indentation - 1)}{attribute}
-            {Indent(writer.Indentation - 1)}{target}
-            """;
+        expectedWriter.WriteLine("[TestAttribute]");
+        expectedWriter.WriteLine(attribute);
+        expectedWriter.WriteLine(targetTypeDeclaration);
+        string expected = expectedWriter.ToString();
 
         Contains(expected, writer.ToString());
-
-        static string GetTypeDeclaration(string d, out string attributesOrEmpty)
-        {
-            attributesOrEmpty = string.Empty;
-
-            int indexOf = d.IndexOf('[');
-            if (indexOf != -1)
-            {
-                attributesOrEmpty = d[indexOf..(d.LastIndexOf(']') + 1)] + Environment.NewLine;
-            }
-
-            indexOf = d.LastIndexOf('\n');
-            return indexOf != -1 ? d.Substring(indexOf + 1) : d;
-        }
     }
 
     [Theory, InlineData(true), InlineData(false)]
