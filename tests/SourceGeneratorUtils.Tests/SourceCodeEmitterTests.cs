@@ -1,6 +1,6 @@
 ﻿namespace SourceGeneratorUtils.Tests;
 
-public class TypeSourceCodeEmitterTests
+public class SourceCodeEmitterTests
 {
     private static readonly TestTypeGenerationSpec DefaultSpec = new()
     {
@@ -9,12 +9,16 @@ public class TypeSourceCodeEmitterTests
         TypeDeclarations = ImmutableEquatableArray<string>.Empty
     };
 
-    [Fact]
-    public void GetAttributesToApply_ReturnsEmptyEnumerable()
+    [Fact] public void GetOuterUsingDirectives_ReturnsEmptyEnumerable()
+        => Empty(new ThrowTypeSourceCodeEmitter().GetOuterUsingDirectives(DefaultSpec));
+
+    [Fact] public void GetInnerUsingDirectives_ReturnsEmptyEnumerable()
+        => Empty(new ThrowTypeSourceCodeEmitter().GetInnerUsingDirectives(DefaultSpec));
+
+    [Fact] public void GetAttributesToApply_ReturnsEmptyEnumerable()
         => Empty(new ThrowTypeSourceCodeEmitter().GetAttributesToApply(DefaultSpec));
 
-    [Fact]
-    public void GetInterfacesToImplement_ReturnsEmptyEnumerable()
+    [Fact] public void GetInterfacesToImplement_ReturnsEmptyEnumerable()
         => Empty(new ThrowTypeSourceCodeEmitter().GetInterfacesToImplement(DefaultSpec));
 
     private sealed record TestTypeGenerationSpec : AbstractTypeGenerationSpec
@@ -22,7 +26,7 @@ public class TypeSourceCodeEmitterTests
         public required int TestNumber { get; init; }
     }
 
-    private sealed class ThrowTypeSourceCodeEmitter : TypeSourceCodeEmitter<TestTypeGenerationSpec>
+    private sealed record ThrowTypeSourceCodeEmitter : SourceCodeEmitter<TestTypeGenerationSpec>
     {
         public override void EmitTargetSourceCode(TestTypeGenerationSpec target, SourceWriter writer)
         {

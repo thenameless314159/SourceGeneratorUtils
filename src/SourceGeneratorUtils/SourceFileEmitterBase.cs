@@ -12,13 +12,13 @@ public abstract class SourceFileEmitterBase<TSpec> : ISourceFileGenerator<TSpec>
     /// <summary>
     /// Gets or init a reference to the options to be used for emitting source files within this <see cref="SourceFileEmitterBase{TSpec}"/> instance.
     /// </summary>
-    public SourceFileEmitterOptions Options { get; init; }
+    public SourceFileEmitterBaseOptions Options { get; init; }
 
     /// <summary>
     /// Creates a new <see cref="SourceFileEmitterBase{TSpec}"/> instance with the given <paramref name="options"/>.
     /// </summary>
-    /// <param name="options">The <see cref="SourceFileEmitterOptions"/> options.</param>
-    protected SourceFileEmitterBase(SourceFileEmitterOptions options) => Options = options;
+    /// <param name="options">The <see cref="SourceFileEmitterBaseOptions"/> options.</param>
+    protected SourceFileEmitterBase(SourceFileEmitterBaseOptions options) => Options = options;
 
     /// <summary>
     /// Formats a file name for the given target descriptor.
@@ -29,10 +29,12 @@ public abstract class SourceFileEmitterBase<TSpec> : ISourceFileGenerator<TSpec>
 
     /// <summary>
     /// Emits the source code for the target <typeparamref name="TSpec"/> to the provided <see cref="SourceWriter"/>.
+    /// </summary>
+    /// <remarks>
     /// The <see cref="SourceWriter"/> should be created using the <see cref="CreateSourceWriter"/> method.
     /// This method should be overridden in a derived class to provide the specific logic for emitting the target declaration and body.
-    /// The writer will typically be at the type declaration, ready to emit members with custom logic.
-    /// </summary>
+    /// The writer will typically be left before the type declarations, ready to emit them with custom logic.
+    /// </remarks>
     /// <param name="target">The target <typeparamref name="TSpec"/> whose implementation needs to be emitted.</param>
     /// <param name="writer">The <see cref="SourceWriter"/> to use for emitting the target implementation, typically created using <see cref="CreateSourceWriter(TSpec)"/>.</param>
     public abstract void EmitTargetSourceCode(TSpec target, SourceWriter writer);
@@ -43,15 +45,14 @@ public abstract class SourceFileEmitterBase<TSpec> : ISourceFileGenerator<TSpec>
     /// <param name="target">The target <typeparamref name="TSpec"/>.</param>
     /// <returns>A list of the additional outer using directives.</returns>
     /// <remarks> Made protected internal for testing purposes.</remarks>
-    protected internal virtual IEnumerable<string> GetTargetOuterUsingDirectives(TSpec target) => Enumerable.Empty<string>();
+    public virtual IEnumerable<string> GetTargetOuterUsingDirectives(TSpec target) => Enumerable.Empty<string>();
 
     /// <summary>
     /// Allows to specify additional inner using directives to apply based on the target <typeparamref name="TSpec"/>.
     /// </summary>
     /// <param name="target">The target <typeparamref name="TSpec"/>.</param>
     /// <returns>A list of the additional inner using directives.</returns>
-    /// <remarks> Made protected internal for testing purposes.</remarks>
-    protected internal virtual IEnumerable<string> GetTargetInnerUsingDirectives(TSpec target) => Enumerable.Empty<string>();
+    public virtual IEnumerable<string> GetTargetInnerUsingDirectives(TSpec target) => Enumerable.Empty<string>();
 
     /// <inheritdoc />
     public SourceFile GenerateSource(TSpec target)
@@ -92,6 +93,7 @@ public abstract class SourceFileEmitterBase<TSpec> : ISourceFileGenerator<TSpec>
         // Emit the outer using directives if any.
         IReadOnlyList<string> targetOuterUsingDirectives = GetTargetOuterUsingDirectives(target).ToList();
         // review: should we enumerate targetOuterUsingDirectives multiple times with .Any() instead ?
+        //         not sure since Any() ain't optimized on netstandard2.0
         if (Options.DefaultOuterUsingDirectives.Count > 0 || targetOuterUsingDirectives.Count > 0)
         {
             var outerUsingDirectives = GetDistinctUsingDirectives(
@@ -117,7 +119,8 @@ public abstract class SourceFileEmitterBase<TSpec> : ISourceFileGenerator<TSpec>
 
         // Emit the inner using directives if a namespace have been declared and if any are present.
         IReadOnlyList<string> targetInnerUsingDirectives = GetTargetInnerUsingDirectives(target).ToList();
-        // review: should we enumerate targetInnerUsingDirectives multiple times with .Any() instead ?
+        // review: should we enumerate targetOuterUsingDirectives multiple times with .Any() instead ?
+        //         not sure since Any() ain't optimized on netstandard2.0
         if (Options.DefaultInnerUsingDirectives.Count > 0 || targetInnerUsingDirectives.Count > 0)
         {
             var innerUsingDirectives = GetDistinctUsingDirectives(

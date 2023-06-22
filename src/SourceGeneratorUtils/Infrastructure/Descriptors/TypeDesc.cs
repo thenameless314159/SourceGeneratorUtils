@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace SourceGeneratorUtils;
 
 /// <summary>
-/// An equatable value representing type identity with property or fields members.
+/// An equatable value representing basic type identity to be used for general-purpose source generation.
 /// </summary>
 [DebuggerDisplay("Name={Name}")]
 public sealed class TypeDesc : ITypeDescriptor, IEquatable<TypeDesc>

@@ -32,7 +32,7 @@ public class DefaultSourceFileEmitterTests
             Name = "TestType",
         };
 
-        var emitter = new DefaultSourceFileEmitter { SourceCodeEmitters = sourceCodeEmitters };
+        var emitter = new DefaultSourceFileEmitter(sourceCodeEmitters);
         var sourceFile = emitter.GenerateSource(DefaultGenerationSpec.CreateFrom(targetTypeDesc));
 
         const string expected = """
@@ -52,7 +52,7 @@ public class DefaultSourceFileEmitterTests
         EndsWith(expected, sourceFile.Content.ToString());
     }
 
-    private sealed class TestSourceCodeEmitter : DefaultSourceCodeEmitter
+    private sealed record TestSourceCodeEmitter : DefaultSourceCodeEmitter
     {
         public IReadOnlyList<string> AttributesToApply { get; init; } = Array.Empty<string>();
         public IReadOnlyList<string> InterfacesToImplement { get; init; } = Array.Empty<string>();

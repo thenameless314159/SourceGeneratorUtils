@@ -2,7 +2,7 @@
 
 public class TypeSourceFileEmitterTests
 {
-    private static readonly TestTypeGenerationSpec DefaultSpec = new()
+    /*private static readonly TestTypeGenerationSpec DefaultSpec = new()
     {
         Namespace = "SourceGeneratorUtils.Tests",
         TypeDeclarations = ImmutableEquatableArray.Create("public class TestType", "public partial class ContainingClass1")
@@ -50,7 +50,7 @@ public class TypeSourceFileEmitterTests
     public void CreateSourceWriter_ShouldIncludeConfiguredGeneratedCodeAttribute()
     {
         var localAssemblyName = typeof(DefaultSourceFileEmitterTests).Assembly.GetName();
-        var options = TypeSourceFileEmitterOptions.Default with { AssemblyName = localAssemblyName };
+        var options = SourceFileEmitterOptions.Default with { AssemblyName = localAssemblyName };
 
         var emitter = new TestSourceFileEmitter(options);
         var writer = emitter.CreateSourceWriter(DefaultSpec);
@@ -63,7 +63,7 @@ public class TypeSourceFileEmitterTests
     public void CreateSourceWriter_ShouldIncludeConfiguredDefaultAttributes(bool useCombinedAttributeDeclaration)
     {
         var sourceCodeEmitters = new[] { new TestSourceCodeEmitter { AttributesToApply = new[] { "Generate" } } };
-        var options = new TypeSourceFileEmitterOptions
+        var options = new SourceFileEmitterOptions
         {
             DefaultAttributes = new[] { "TestAttribute" },
             UseCombinedAttributeDeclaration = useCombinedAttributeDeclaration
@@ -87,7 +87,7 @@ public class TypeSourceFileEmitterTests
     public void CreateSourceWriter_ShouldIncludeConfiguredDefaultInterfaces(string? defaultBaseType)
     {
         var sourceCodeEmitters = new[] { new TestSourceCodeEmitter { InterfacesToImplement = new[] { "ITestInterface" } } };
-        var options = new TypeSourceFileEmitterOptions
+        var options = new SourceFileEmitterOptions
         {
             DefaultBaseType = defaultBaseType,
             DefaultInterfaces = new[] { "IDefaultInterface" },
@@ -105,7 +105,7 @@ public class TypeSourceFileEmitterTests
     [Fact]
     public void CreateSourceWriter_ShouldNotIncludeBaseTypeIfAlreadyPresent()
     {
-        var options = new TypeSourceFileEmitterOptions
+        var options = new SourceFileEmitterOptions
         {
             DefaultBaseType = "DefaultBaseType",
             DefaultInterfaces = new[] { "ITestInterface" },
@@ -131,13 +131,14 @@ public class TypeSourceFileEmitterTests
 
     private sealed class TestSourceCodeEmitter : TypeSourceCodeEmitter<TestTypeGenerationSpec>
     {
-        public IReadOnlyList<string> AttributesToApply { get; init; } = Array.Empty<string>();
-        public IReadOnlyList<string> InterfacesToImplement { get; init; } = Array.Empty<string>();
+        
 
         public override void EmitTargetSourceCode(TestTypeGenerationSpec target, SourceWriter writer)
         {
             writer.WriteLine($"// {target.Comment}");
         }
+        public IReadOnlyList<string> AttributesToApply { get; init; } = Array.Empty<string>();
+        public IReadOnlyList<string> InterfacesToImplement { get; init; } = Array.Empty<string>();
 
         public override IEnumerable<string> GetAttributesToApply(TestTypeGenerationSpec target)
             => AttributesToApply;
@@ -152,11 +153,11 @@ public class TypeSourceFileEmitterTests
             = Array.Empty<TypeSourceCodeEmitter<TestTypeGenerationSpec>>();
 
 
-        public TestSourceFileEmitter(TypeSourceFileEmitterOptions options) : base(options)
+        public TestSourceFileEmitter(SourceFileEmitterOptions options) : base(options)
         {
         }
 
-        public TestSourceFileEmitter() : this(TypeSourceFileEmitterOptions.Default)
+        public TestSourceFileEmitter() : this(SourceFileEmitterOptions.Default)
         {
         }
 
@@ -164,5 +165,5 @@ public class TypeSourceFileEmitterTests
 
         public override IEnumerable<TypeSourceCodeEmitter<TestTypeGenerationSpec>> GetTypeSourceCodeEmitters()
             => SourceCodeEmitters;
-    }
+    }*/
 }

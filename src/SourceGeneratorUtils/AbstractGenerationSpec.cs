@@ -1,7 +1,7 @@
 ﻿namespace SourceGeneratorUtils;
 
 /// <summary>
-/// A basic abstractions that must be implemented with relevant members for your source generation logic
+/// An abstraction that must be implemented with relevant members for your source generation logic
 /// in order to models common specifications for generated source code.
 /// </summary>
 /// <remarks>
