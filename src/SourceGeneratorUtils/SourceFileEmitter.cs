@@ -136,25 +136,7 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
             writer.WriteLine(specClasses[i]);
             writer.OpenBlock();
         }
-
-        // Emit the attributes to apply on the target class if any.
-        IReadOnlyList<string> targetAttributesToApply = GetTargetAttributesToApply(target).ToList();
-        if (Options.DefaultAttributes.Count > 0 || targetAttributesToApply.Count > 0)
-        {
-            var attributes = Options.DefaultAttributes.Concat(targetAttributesToApply);
-            writer.WriteLine(
-                Options.UseCombinedAttributeDeclaration
-                    ? $"[{string.Join(", ", attributes)}]"
-                    : string.Join(Environment.NewLine, attributes.Select(static a => $"[{a}]")));
-        }
-
-        // Emit the GeneratedCodeAttribute if needed.
-        if (Options.AssemblyName != null)
-        {
-            // Annotate the target class with the GeneratedCodeAttribute
-            writer.WriteLine($"""[global::System.CodeDom.Compiler.GeneratedCodeAttribute("{Options.AssemblyName.Name}", "{Options.AssemblyName.Version}")]""");
-        }
-
+        
         // Gather the interfaces and base type to implement on the target class declaration.
         IReadOnlyList<string> targetInterfacesToImplement = GetTargetInterfacesToImplement(target).ToList();
         string? interfacesToImplement = Options.DefaultInterfaces.Count > 0 || targetInterfacesToImplement.Count > 0
@@ -162,10 +144,34 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
             : null;
 
         bool hasInterfacesToImplement = !string.IsNullOrWhiteSpace(interfacesToImplement);
-        string targetDeclaration = specClasses[0];
 
-        // The target doesn't have any base declaration
-        if (targetDeclaration.IndexOf(':') == -1)
+        string targetDeclaration = specClasses[0];
+        Debug.Assert(!string.IsNullOrWhiteSpace(targetDeclaration));
+
+        int lastIndexOfNewLine = targetDeclaration.LastIndexOf('\n');
+        bool targetEmbedDocumentation = targetDeclaration[0] == '/';
+
+        string targetTypeDeclaration = targetEmbedDocumentation
+            ? targetDeclaration[(lastIndexOfNewLine + 1)..]
+            : targetDeclaration;
+
+        // Apply the attributes on the target class if any.
+        IReadOnlyList<string> targetAttributesToApply = Options.AssemblyName != null
+            ? GetTargetAttributesToApply(target).Append($"global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"{Options.AssemblyName.Name}\", \"{Options.AssemblyName.Version}\")").ToList()
+            : GetTargetAttributesToApply(target).ToList();
+
+        if (Options.DefaultAttributes.Count > 0 || targetAttributesToApply.Count > 0)
+        {
+            IEnumerable<string> attributes = Options.DefaultAttributes.Concat(targetAttributesToApply);
+            string attributesToApply = !Options.UseCombinedAttributeDeclaration
+                ? string.Join(Environment.NewLine, attributes.Select(static a => $"[{a}]"))
+                : $"[{string.Join(", ", attributes)}]";
+
+            targetTypeDeclaration =  attributesToApply + Environment.NewLine + targetTypeDeclaration;
+        }
+
+        // The target doesn't have any declared base type
+        if (targetTypeDeclaration.IndexOf(':') == -1)
         {
             bool hasBaseTypeToInheritFrom = !string.IsNullOrWhiteSpace(Options.DefaultBaseType);
             bool hasBoth = hasBaseTypeToInheritFrom && hasInterfacesToImplement;
@@ -174,21 +180,44 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
                 ? $" : {Options.DefaultBaseType ?? string.Empty}{SeparatorOrEmpty(hasBoth, CommaWithSpace)}{interfacesToImplement}"
                 : string.Empty;
 
-            // Emit the target class declaration with base type and interfaces.
-            writer.WriteLine($"{targetDeclaration}{baseTypeWithInterfaces}");
-            writer.OpenBlock();
-            return writer;
+            targetDeclaration = GetTargetDeclaration(targetDeclaration, 
+                $"{targetTypeDeclaration}{baseTypeWithInterfaces}", 
+                targetEmbedDocumentation);
+        }
+        else
+        {
+            // review: may check later whether the already declared base is an interface or not but how ?
+            //         Some non-interfaces types may start with the letter I like Index or ImmutableArray...
+            targetDeclaration = GetTargetDeclaration(targetDeclaration, 
+                $"{targetTypeDeclaration}{SeparatorOrEmpty(hasInterfacesToImplement, CommaWithSpace)}{interfacesToImplement}", 
+                targetEmbedDocumentation);
         }
 
         // Emit the target class declaration with interfaces only.
-        // review: may check later whether the already declared base is an interface or not but how ?
-        //         Some non-interfaces types may start with the letter I like Index or ImmutableArray...
-        writer.WriteLine($"{targetDeclaration}{SeparatorOrEmpty(hasInterfacesToImplement, CommaWithSpace)}{interfacesToImplement}");
+        writer.WriteLine(targetDeclaration);
         writer.OpenBlock();
 
         return writer;
 
         static string SeparatorOrEmpty(bool returnSeparator, string separator) => returnSeparator ? separator : string.Empty;
+        static string GetTargetDeclaration(string targetDeclaration, string typeDeclaration, bool embedDocumentation)
+        {
+            if (typeDeclaration == targetDeclaration) // return self if equal
+                return targetDeclaration;
+
+            if (!embedDocumentation) // return the formatted declaration if no documentation
+                return typeDeclaration;
+
+            // Otherwise, return the formatted declaration with the documentation
+            int lastIndexOfNewLine = targetDeclaration.LastIndexOf('\n');
+
+            return targetDeclaration[lastIndexOfNewLine - 1] switch
+            {
+                // target has attributes
+                ']' => targetDeclaration[..(targetDeclaration.IndexOf('[') - 1)] + typeDeclaration,
+                _ => targetDeclaration[..(lastIndexOfNewLine + 1)] + typeDeclaration
+            };
+        }
     }
 
     /// <summary>

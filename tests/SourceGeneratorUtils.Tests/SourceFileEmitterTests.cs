@@ -157,17 +157,69 @@ public class SourceFileEmitterTests
         StartsWith(expected, writer.ToString());
     }
 
-    [Fact]
-    public void CreateSourceWriter_ShouldIncludeConfiguredGeneratedCodeAttribute()
+    [Theory]
+    [InlineData("public class TestType")]
+    [InlineData("""
+        /// <summary>
+        /// My <see cref="global::Tests.TestType"/> is awesome !
+        /// </summary>
+        public class TestType
+        """)]
+    [InlineData("""
+        /// <summary>
+        /// My <see cref="global::Tests.TestType"/> is awesome !
+        /// </summary>
+        [WithAttribute]
+        public class TestType
+        """)]
+    [InlineData("""
+        /// <summary>
+        /// My <see cref="global::Tests.TestType"/> is awesome !
+        /// </summary>
+        public class TestType : WithBaseType
+        """)]
+    public void CreateSourceWriter_ShouldIncludeConfiguredGeneratedCodeAttribute_OnTopOfTargetTypeDeclaration(string typeDeclaration)
     {
         var localAssemblyName = typeof(DefaultSourceFileEmitterTests).Assembly.GetName();
-        var options = SourceFileEmitterOptions.Default with { AssemblyName = localAssemblyName };
-
+        var options = SourceFileEmitterOptions.Default with { AssemblyName = localAssemblyName, DefaultAttributes = new []{ "TestAttribute" }};
         var emitter = new TestSourceFileEmitter(options);
-        var writer = emitter.CreateSourceWriter(DefaultSpec);
 
-        string expected = $"""[global::System.CodeDom.Compiler.GeneratedCodeAttribute("{options.AssemblyName.Name}", "{options.AssemblyName.Version}")]""";
+        TestGenerationSpec spec = new()
+        {
+            Namespace = "SourceGeneratorUtils.Tests",
+            TypeDeclarations = ImmutableEquatableArray.Create(typeDeclaration)
+        };
+
+        var writer = emitter.CreateSourceWriter(spec);
+
+        string attribute = $"""[global::System.CodeDom.Compiler.GeneratedCodeAttribute("{options.AssemblyName.Name}", "{options.AssemblyName.Version}")]""";
+        string target = GetTypeDeclaration(typeDeclaration, out string additionalAttributes);
+
+        additionalAttributes = additionalAttributes != string.Empty 
+            ? Environment.NewLine + Indent(writer.Indentation - 1) + additionalAttributes
+            : additionalAttributes;
+        
+        string expected = $"""
+            {additionalAttributes}{Indent(writer.Indentation - 1)}[TestAttribute]
+            {Indent(writer.Indentation - 1)}{attribute}
+            {Indent(writer.Indentation - 1)}{target}
+            """;
+
         Contains(expected, writer.ToString());
+
+        static string GetTypeDeclaration(string d, out string attributesOrEmpty)
+        {
+            attributesOrEmpty = string.Empty;
+
+            int indexOf = d.IndexOf('[');
+            if (indexOf != -1)
+            {
+                attributesOrEmpty = d[indexOf..(d.LastIndexOf(']') + 1)] + Environment.NewLine;
+            }
+
+            indexOf = d.LastIndexOf('\n');
+            return indexOf != -1 ? d.Substring(indexOf + 1) : d;
+        }
     }
 
     [Theory, InlineData(true), InlineData(false)]
@@ -213,26 +265,29 @@ public class SourceFileEmitterTests
             Contains("public class TestType : IDefaultInterface, ITestInterface", output);
     }
 
-    [Fact]
-    public void CreateSourceWriter_ShouldNotIncludeBaseTypeIfAlreadyPresent()
+    [Theory]
+    [InlineData("public class TestType : BaseType")]
+    [InlineData("""
+        /// <summary>
+        /// My <see cref="global::Tests.TestType"/> with base is awesome !
+        /// </summary>
+        public class TestType : BaseType
+        """)]
+    public void CreateSourceWriter_ShouldNotIncludeBaseTypeIfAlreadyPresent(string typeDeclaration)
     {
-        var options = new SourceFileEmitterOptions
-        {
-            DefaultBaseType = "DefaultBaseType",
-            DefaultInterfaces = new[] { "ITestInterface" },
-        };
+        const string defaultBaseType = "DefaultBaseType";
 
+        var options = new SourceFileEmitterOptions { DefaultBaseType = defaultBaseType, };
         var emitter = new TestSourceFileEmitter(options);
 
         TestGenerationSpec specWithBaseType = new()
         {
             Namespace = "SourceGeneratorUtils.Tests",
-            TypeDeclarations = ImmutableEquatableArray.Create("public class TestType : BaseType")
+            TypeDeclarations = ImmutableEquatableArray.Create(typeDeclaration)
         };
 
         var output = emitter.CreateSourceWriter(specWithBaseType).ToString();
-        DoesNotContain("DefaultBaseType", output);
-        Contains(specWithBaseType.TypeDeclarations[0] + ", ITestInterface", output);
+        DoesNotContain(defaultBaseType, output);
     }
 
     private static string EmptyOrNewLines(int count)
@@ -245,6 +300,8 @@ public class SourceFileEmitterTests
 
         return builder.ToString();
     }
+
+    private static string Indent(int count) => new(' ', count * 4);
 
     private sealed record TestGenerationSpec : AbstractTypeGenerationSpec
     {
