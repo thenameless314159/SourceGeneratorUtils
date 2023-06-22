@@ -3,7 +3,7 @@
 public class SourceFileEmitterBaseTests
 {
     private static readonly TestSourceGenerationSpec DefaultSpec = new() { Namespace = "SourceGeneratorUtils.Tests" };
-    private readonly TestSourceFileEmitter _emitter = new(SourceFileEmitterOptions.Default);
+    private readonly TestSourceFileEmitter _emitter = new(SourceFileEmitterBaseOptions.Default);
 
     [Fact] public void GetTargetOuterUsingDirectives_ReturnsEmptyEnumerable()
         => Empty(new EmptySourceFileEmitter().GetTargetOuterUsingDirectives(DefaultSpec));
@@ -154,7 +154,7 @@ public class SourceFileEmitterBaseTests
 
     private sealed class EmptySourceFileEmitter : SourceFileEmitterBase<TestSourceGenerationSpec>
     {
-        public EmptySourceFileEmitter() : base(SourceFileEmitterOptions.Default)
+        public EmptySourceFileEmitter() : base(SourceFileEmitterBaseOptions.Default)
         {
         }
 
@@ -170,7 +170,7 @@ public class SourceFileEmitterBaseTests
         public bool EmitTargetSourceCodeCalled { get; private set; }
         public bool GetFileNameCalled { get; private set; }
 
-        public TestSourceFileEmitter(SourceFileEmitterOptions options) : base(options)
+        public TestSourceFileEmitter(SourceFileEmitterBaseOptions options) : base(options)
         {
         }
 
@@ -186,10 +186,10 @@ public class SourceFileEmitterBaseTests
             writer.WriteLine("// " + target.Comment);
         }
 
-        protected internal override IReadOnlyList<string> GetTargetOuterUsingDirectives(TestSourceGenerationSpec target)
+        public override IReadOnlyList<string> GetTargetOuterUsingDirectives(TestSourceGenerationSpec target)
             => target.OuterUsingDirectives;
 
-        protected internal override IReadOnlyList<string> GetTargetInnerUsingDirectives(TestSourceGenerationSpec target)
+        public override IReadOnlyList<string> GetTargetInnerUsingDirectives(TestSourceGenerationSpec target)
             => target.InnerUsingDirectives;
     }
 }

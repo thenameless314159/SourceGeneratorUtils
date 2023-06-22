@@ -39,6 +39,33 @@ public static class TypeDescExtensions
     }
 
     /// <summary>
+    /// Gets the type modifiers declaration for the given <paramref name="descriptor"/> or an empty string if none.
+    /// </summary>
+    /// <param name="descriptor">The type descriptor.</param>
+    /// <returns>The type modifiers declaration or an empty string if none.</returns>
+    public static string GetTypeModifiersDeclaration(this TypeDesc descriptor)
+    {
+        StringBuilder sb = new();
+        AppendTypeModifiers(descriptor, sb);
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Converts the given <paramref name="descriptor"/> to a <see cref="TypeRef"/>.
+    /// </summary>
+    /// <param name="descriptor">The type descriptor.</param>
+    /// <returns>The type name with generic types if any.</returns>
+    public static TypeRef ToTypeRef(this TypeDesc descriptor)
+        => new
+        (
+            descriptor.Name,
+            descriptor.Namespace,
+            descriptor.TypeKind,
+            descriptor.IsValueType,
+            descriptor.SpecialType
+        );
+
+    /// <summary>
     /// Converts the given <paramref name="descriptor"/> to a type declaration like <c>public class MyClass<T1></T1></c>.
     /// </summary>
     /// <param name="descriptor">The type descriptor.</param>
@@ -50,11 +77,7 @@ public static class TypeDescExtensions
         sb.Append(descriptor.Accessibility.GetAccessibilityString());
         sb.Append(' ');
 
-        if (!string.IsNullOrEmpty(descriptor.TypeModifier))
-        {
-            sb.Append(descriptor.TypeModifier);
-            sb.Append(' ');
-        }
+        AppendTypeModifiers(descriptor, sb);
 
         sb.Append(descriptor.TypeKind.GetTypeKindString(descriptor.IsRecord));
         sb.Append(' ');
@@ -87,6 +110,30 @@ public static class TypeDescExtensions
         }
 
         return sb.ToString();
+    }
+
+    private static void AppendTypeModifiers(TypeDesc descriptor, StringBuilder sb)
+    {
+        if (descriptor is { IsStatic: true, IsValueType: false, IsSealed: false })
+        {
+            sb.Append("static ");
+        }
+        if (descriptor is { IsSealed: true, IsValueType: false, IsStatic: false })
+        {
+            sb.Append("sealed ");
+        }
+        if (descriptor is { IsAbstract: true, IsValueType: false, IsStatic: false })
+        {
+            sb.Append("abstract ");
+        }
+        if (descriptor is { IsReadOnly: true, IsValueType: true })
+        {
+            sb.Append("readonly ");
+        }
+        if (descriptor.IsPartial)
+        {
+            sb.Append("partial ");
+        }
     }
 
     private static void AppendTypeNameDeclaration(TypeDesc descriptor, StringBuilder sb)

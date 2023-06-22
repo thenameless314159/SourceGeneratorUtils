@@ -1,34 +1,34 @@
 ﻿namespace SourceGeneratorUtils;
 
 /// <summary>
-/// Provides a default implementation of <see cref="TypeSourceFileEmitter{TDescriptor}"/> that uses <see cref="DefaultGenerationSpec"/> as the descriptor.
+/// Provides a default implementation of <see cref="SourceFileEmitter{TDescriptor}"/> that uses <see cref="DefaultGenerationSpec"/> as the descriptor.
 /// </summary>
-public class DefaultSourceFileEmitter : TypeSourceFileEmitter<DefaultGenerationSpec>
+public class DefaultSourceFileEmitter : SourceFileEmitter<DefaultGenerationSpec>
 {
     /// <summary>
-    /// Gets or sets the <see cref="DefaultSourceCodeEmitter"/>s to use to generate source code.
-    /// </summary>
-    public IReadOnlyList<DefaultSourceCodeEmitter> SourceCodeEmitters { get; init; } = Array.Empty<DefaultSourceCodeEmitter>();
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultSourceFileEmitter"/> class with the specified <paramref name="options"/>.
+    /// Initializes a new instance of the <see cref="DefaultSourceFileEmitter"/> class with the specified <paramref name="options"/> and <paramref name="codeEmitters"/>.
     /// </summary>
     /// <param name="options">The options to use to generate source files.</param>
-    public DefaultSourceFileEmitter(TypeSourceFileEmitterOptions options) : base(options)
+    /// <param name="codeEmitters">The <see cref="DefaultSourceCodeEmitter"/>s to use to generate source code.</param>
+    public DefaultSourceFileEmitter(SourceFileEmitterOptions options, params DefaultSourceCodeEmitter[] codeEmitters) : base(options, codeEmitters)
     {
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultSourceFileEmitter"/> class with the default <see cref="TypeSourceFileEmitterOptions"/>.
+    /// Initializes a new instance of the <see cref="DefaultSourceFileEmitter"/> class with the default <see cref="SourceFileEmitterOptions"/> and the specified <paramref name="codeEmitters"/>.
     /// </summary>
-    public DefaultSourceFileEmitter() : this(TypeSourceFileEmitterOptions.Default)
+    /// <param name="codeEmitters">The <see cref="DefaultSourceCodeEmitter"/>s to use to generate source code.</param>
+    public DefaultSourceFileEmitter(IReadOnlyList<DefaultSourceCodeEmitter> codeEmitters) : base(codeEmitters)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultSourceFileEmitter"/> class with the default <see cref="SourceFileEmitterOptions"/>.
+    /// </summary>
+    public DefaultSourceFileEmitter() : base(SourceFileEmitterOptions.Default)
     {
     }
 
     /// <inheritdoc/>
     public override string GetFileName(DefaultGenerationSpec target) => $"{target.TargetType.Name}.g.cs";
-
-    /// <inheritdoc/>
-    public override IEnumerable<TypeSourceCodeEmitter<DefaultGenerationSpec>> GetTypeSourceCodeEmitters()
-        => SourceCodeEmitters;
 }

@@ -10,21 +10,55 @@ public sealed record DefaultGenerationSpec : AbstractTypeGenerationSpec
     /// from the given <paramref name="target"/> <see cref="TypeDesc"/>.
     /// </summary>
     /// <param name="target">The target <see cref="ITypeDescriptor"/>.</param>
-    /// <param name="descriptors">The generated types.</param>
-    /// <returns></returns>
-    public static DefaultGenerationSpec CreateFrom(TypeDesc target, params ITypeDescriptor[] descriptors) => new()
-    {
-        TargetType = target,
-        Namespace = target.Namespace,
-        GeneratedTypes = ImmutableEquatableArray.Create(descriptors),
-        TypeDeclarations = new ImmutableEquatableArray<string>(target.GetTypeDeclarationWithContainingTypes()),
-    };
+    /// <param name="targetMembers">The target type <see cref="PropertyDesc"/> members.</param>
+    /// <param name="generatedTypes">The generated <see cref="ITypeDescriptor"/> types.</param>
+    /// <returns>A new instance of <see cref="DefaultGenerationSpec"/>.</returns>
+    public static DefaultGenerationSpec Create(
+        TypeDesc target, 
+        IEnumerable<PropertyDesc>? targetMembers = null,
+        IEnumerable<ITypeDescriptor>? generatedTypes = null) 
+        => new() 
+        {
+            Namespace = target.Namespace,
+            TargetType = target.ToTypeRef(),
+            TypeDeclarations = target.GetTypeDeclarationWithContainingTypes().ToImmutableEquatableArray(),
+            TargetMembers = targetMembers?.ToImmutableEquatableArray() ?? ImmutableEquatableArray.Empty<PropertyDesc>(),
+            GeneratedTypes = generatedTypes?.ToImmutableEquatableArray() ?? ImmutableEquatableArray.Empty<ITypeDescriptor>(),
+        };
 
     /// <summary>
-    /// Gets the target type descriptor.
-    /// Would typically either be a <see cref="TypeRef"/> or a <see cref="TypeDesc"/>.
+    /// Creates a new instance of <see cref="DefaultGenerationSpec"/> with <see cref="AbstractTypeGenerationSpec.TypeDeclarations"/> populated
+    /// from the given <paramref name="target"/> <see cref="TypeDesc"/>.
     /// </summary>
-    public required ITypeDescriptor TargetType { get; init; }
+    /// <remarks>
+    /// This function takes arrays instead of <see cref="IEnumerable{T}"/> to avoid potential re-allocations.
+    /// </remarks>
+    /// <param name="target">The target <see cref="ITypeDescriptor"/>.</param>
+    /// <param name="targetMembers">The target type <see cref="PropertyDesc"/> members.</param>
+    /// <param name="generatedTypes">The generated <see cref="ITypeDescriptor"/> types.</param>
+    /// <returns>A new instance of <see cref="DefaultGenerationSpec"/>.</returns>
+    public static DefaultGenerationSpec CreateFrom(
+        TypeDesc target,
+        PropertyDesc[]? targetMembers = null,
+        ITypeDescriptor[]? generatedTypes = null)
+        => new()
+        {
+            Namespace = target.Namespace,
+            TargetType = target.ToTypeRef(),
+            TypeDeclarations = target.GetTypeDeclarationWithContainingTypes().ToImmutableEquatableArray(),
+            TargetMembers = ImmutableEquatableArray.Create(targetMembers ?? Array.Empty<PropertyDesc>()),
+            GeneratedTypes = ImmutableEquatableArray.Create(generatedTypes ?? Array.Empty<ITypeDescriptor>()),
+        };
+
+    /// <summary>
+    /// Gets the target type ref descriptor.
+    /// </summary>
+    public required TypeRef TargetType { get; init; }
+
+    /// <summary>
+    /// Gets the target type members descriptors.
+    /// </summary>
+    public required ImmutableEquatableArray<PropertyDesc> TargetMembers { get; init; }
 
     /// <summary>
     /// Gets an array of <see cref="ITypeDescriptor"/> that represents all the types that needs a source file to be generated for.
