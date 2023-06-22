@@ -1,9 +1,12 @@
-﻿using System.Text;
+﻿using Microsoft.CodeAnalysis;
+using System.Reflection;
+using System.Text;
 
 namespace SourceGeneratorUtils.Tests;
 
 public class SourceFileEmitterTests
 {
+    private static readonly AssemblyName _localAssemblyName = typeof(SourceFileEmitterTests).Assembly.GetName();
     private static readonly TestGenerationSpec DefaultSpec = new()
     {
         Namespace = "SourceGeneratorUtils.Tests",
@@ -124,6 +127,23 @@ public class SourceFileEmitterTests
     }
 
     [Fact]
+    public void GetTargetAttributesToApply_EndsWithGeneratedCodeAttributeIfConfigured()
+    {
+        var options = new SourceFileEmitterOptions { AssemblyName = _localAssemblyName };
+        var sourceCodeEmitters = new[]
+        {
+            new ConfigurableTestSourceCodeEmitter { AttributesToApply = new [] { "TestAttribute" }},
+        };
+
+        var emitter = new TestSourceFileEmitter(options, sourceCodeEmitters);
+
+        IEnumerable<string> expected = sourceCodeEmitters.SelectMany(e => e.AttributesToApply)
+            .Append($"global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"{_localAssemblyName.Name}\", \"{_localAssemblyName.Version}\")");
+
+        Equal(expected, emitter.GetTargetAttributesToApply(DefaultSpec));
+    }
+
+    [Fact]
     public void GetTargetInterfacesToImplement_ReturnsAllSourceCodeWritersInterfaces()
     {
         var sourceCodeEmitters = new[]
@@ -180,8 +200,7 @@ public class SourceFileEmitterTests
         """)]
     public void CreateSourceWriter_ShouldIncludeConfiguredGeneratedCodeAttribute_OnTopOfTargetTypeDeclaration(string typeDeclaration)
     {
-        var localAssemblyName = typeof(DefaultSourceFileEmitterTests).Assembly.GetName();
-        var options = SourceFileEmitterOptions.Default with { AssemblyName = localAssemblyName, DefaultAttributes = new []{ "TestAttribute" }};
+        var options = SourceFileEmitterOptions.Default with { AssemblyName = _localAssemblyName, DefaultAttributes = new []{ "TestAttribute" }};
         var emitter = new TestSourceFileEmitter(options);
 
         TestGenerationSpec spec = new()
