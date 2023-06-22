@@ -6,11 +6,11 @@ This library provides a variety of types that help the conception of source gene
 
 - [`SourceWriter`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceWriter.cs) - A minimal wrapper over StringBuilder, it handles indentation in a straightforward manner.
 - [`SourceBuilder`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceBuilder.cs) - Another thin wrapper, this time over a dictionary, to store generated source files and export them to disk. The following type can populate it:
-- [`SourceFileEmitterBase<TSpec>`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceFileEmitterBase.cs) - Encapsulates all the necessary logic to write a C# source file ready for compilation. This is the main abstraction that users should implement to write their own source generation logic.
-- [`SourceCodeEmitter<TSpec>`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceCodeEmitter.cs) - An abstraction that allows developers to break down their source generation logic into smaller components. It is used by [`SourceFileEmitter<TSpec>`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceFileEmitter.cs) to write the source file.
-- [`SourceFileEmitterOptions`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceFileEmitterOptions.cs) - A simple record that holds options for source file generation within a `SourceFileEmitterBase<TSpec>`.
-- [`TypeSourceFileEmitter`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/TypeSourceFileEmitter.cs) - A configurable abstraction that takes care of everything up until the target type body declaration.
-- [`TypeSourceFileEmitterOptions`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/TypeSourceFileEmitterOptions.cs) - A simple record that holds options for source file generation within a `TypeSourceFileEmitter<TSpec>`.
+- [`SourceFileEmitterBase<TSpec>`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceFileEmitterBase.cs) - Base abstraction to encapsulate all the necessary logic to write a C# source file ready for compilation. This abstraction should be used if you don't need target types declaration as well as `SourceCodeEmitter<TSpec>` components.
+- [`SourceFileEmitterBaseOptions`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceFileEmitterBaseOptions.cs) - A simple record that holds options for source file generation within a `SourceFileEmitterBase<TSpec>`.
+- [`SourceCodeEmitter<TSpec>`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceCodeEmitter.cs) - An abstraction that allows developers to break down their source generation logic into smaller reusable components. This type is used by the following:
+- [`SourceFileEmitter<TSpec>`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceFileEmitter.cs) An abstraction encapsulating all the logic necessary to generate ready-to-compile source files for the given target.
+- [`SourceFileEmitterOptions`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceFileEmitterOptions.cs) - A simple record that holds options for source file generation within a `SourceFileEmitter<TSpec>`.
 
 ## Default implementation usage
 **SourceGeneratorUtils** offers a default implementation for the provided abstraction, in the form of [`DefaultSourceFileEmitter`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/DefaultSourceFileEmitter.cs). This implementation has been meticulously crafted to convert [`DefaultGenerationSpec`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/DefaultGenerationSpec.cs) instances into production-ready, compile-ready C# source code.
@@ -54,25 +54,19 @@ sealed class MyInterfaceImplementation : DefaultSourceCodeEmitter
 Next, within the source generator context, we map the target type as a [`TypeDesc`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/Infrastructure/Descriptors/TypeDesc.cs) and create a DefaultGenerationSpec from it, as shown below:
 
 ``` csharp
-TypeDesc myClassDesc = new() // some properties are omitted for brevity
-{
-    IsRecord = true,
-    Name = "MyRecord",
-    Namespace = "MyNamespace",
-    TypeModifier = "partial",
-    TypeKind = TypeKind.Class,
-    Accessibility = Accessibility.Protected,
-    Attributes = ImmutableEquatableArray.Create(new TypeDesc { Name = "MyGeneratorAttribute", }),
-
-    ContainingTypes = ImmutableEquatableArray.Create(new TypeDesc
-    {
-        Name = "MyClass",
-        Namespace = "MyNamespace",
-        TypeModifier = "partial", // may become IsPartial and IsSealed bool properties in the future
-        TypeKind = TypeKind.Class,
-        Accessibility = Accessibility.Internal,
-    })
-};
+// some properties are delibaretely omitted for brevity
+TypeDesc targetDesc = TypeDesc.Create 
+(
+    "MyRecord",
+    isRecord: true,
+    isPatial: true,
+    typeKind: TypeKind.Class
+    @namespace: "MyNamespace",
+    accessibility: Accessibility.Protected,
+    attributes: ImmutableEquatableArray.Create("MyGeneratorAttribute"),
+    containingTypes: ImmutableEquatableArray.Create(
+        TypeDesc.Create("MyClass", isPartial: true, accessibility: Accessibility.Internal, typeKind: TypeKind.Class))
+);
 ```
 
 Finally, we can tie everything together using the bundled [`DefaultSourceFileEmitter`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/DefaultSourceFileEmitter.cs) and [`SourceBuilder`](https://github.com/thenameless314159/SourceGeneratorUtils/blob/main/src/SourceGeneratorUtils/SourceBuilder.cs) to emit the source file:
@@ -80,7 +74,7 @@ Finally, we can tie everything together using the bundled [`DefaultSourceFileEmi
 ``` csharp
 var options = new TypeSourceFileEmitterOptions { AssemblyName = typeof(MyGenerator).Assembly.GetName(), UseFileScopedNamespace = true };
 var sourceEmitter = new DefaultSourceFileEmitter(options) { SourceCodeEmitters = new[] { new MyInterfaceImplementation() } };
-var sourceBuilder = new SourceBuilder().Register(sourceEmitter, DefaultGenerationSpec.CreateFrom(myClassDesc));
+var sourceBuilder = new SourceBuilder().Register(sourceEmitter, DefaultGenerationSpec.CreateFrom(targetDesc));
 sourceBuilder.ExportTo(Directory.GetCurrentDirectory());
 ```
 
