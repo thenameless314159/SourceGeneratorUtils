@@ -201,7 +201,7 @@ public class SourceFileEmitterTests
             : null;
 
         string targetTypeDeclaration = lastIndexOfNewLine != -1
-            ? typeDeclaration[(lastIndexOfNewLine + 1)..]
+            ? typeDeclaration[(lastIndexOfNewLine + Environment.NewLine.Length)..]
             : typeDeclaration;
 
         var expectedWriter = new SourceWriter();

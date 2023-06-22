@@ -173,7 +173,7 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
         }
         
         string targetTypeDeclaration = lastIndexOfNewLine != -1
-            ? targetDeclaration[(lastIndexOfNewLine + 1)..]
+            ? targetDeclaration[(lastIndexOfNewLine + Environment.NewLine.Length)..]
             : targetDeclaration;
 
         // The target doesn't have any declared base type
