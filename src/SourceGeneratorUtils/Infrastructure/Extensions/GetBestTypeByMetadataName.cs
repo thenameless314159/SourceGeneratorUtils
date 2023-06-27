@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 
 namespace SourceGeneratorUtils;
 
-partial class RoslynExtensions
+public static partial class RoslynExtensions
 {
     // Copied from: https://github.com/dotnet/roslyn/blob/main/src/Workspaces/SharedUtilitiesAndExtensions/Compiler/Core/Extensions/CompilationExtensions.cs
     /// <summary>

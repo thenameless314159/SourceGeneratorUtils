@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <EnableDefaultItems>true</EnableDefaultItems>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AnalyzerLanguage>cs</AnalyzerLanguage>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UsingToolXliff>true</UsingToolXliff>
+    <VersionPrefix>0.0.1</VersionPrefix>
+    <LangVersion>Latest</LangVersion>
+    <PackSymbols>false</PackSymbols>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <Import Project="..\src\Directory.Build.props" />
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SourceGeneratorUtils.SourceGeneration.UnitTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\src\SourceGeneratorUtils\**\*.cs" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+
+    <EmbeddedResource Remove="..\src\SourceGeneratorUtils\bin\**\*.cs" />
+    <EmbeddedResource Remove="..\src\SourceGeneratorUtils\obj\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\src\SourceGeneratorUtils\Infrastructure\Polyfills\*.cs" Visible="false" />
+    <Compile Include="..\src\SourceGeneratorUtils\Infrastructure\ImmutableEquatableArray.cs" Visible="false" />
+    <Compile Include="..\src\SourceGeneratorUtils\Infrastructure\Extensions\StringBuilderExtensions.cs" Visible="false" />
+    <Compile Include="..\src\SourceGeneratorUtils\Infrastructure\Extensions\GetBestTypeByMetadataName.cs" Visible="false" />
+  </ItemGroup>
+
+</Project>
