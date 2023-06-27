@@ -93,14 +93,14 @@ public abstract class SourceFileEmitterBase<TSpec> : ISourceFileGenerator<TSpec>
         // Emit the outer using directives if any.
         IReadOnlyList<string> targetOuterUsingDirectives = GetTargetOuterUsingDirectives(target).ToList();
         // review: should we enumerate targetOuterUsingDirectives multiple times with .Any() instead ?
-        //         not sure since Any() ain't optimized on netstandard2.0
+        //         not sure since I believe Any() ain't optimized on netstandard2.0
         if (Options.DefaultOuterUsingDirectives.Count > 0 || targetOuterUsingDirectives.Count > 0)
         {
             var outerUsingDirectives = GetDistinctUsingDirectives(
                 Options.DefaultOuterUsingDirectives
                     .Concat(targetOuterUsingDirectives));
 
-            writer.WriteLine(string.Join(Environment.NewLine, outerUsingDirectives));
+            writer.WriteLine(string.Join(NewLine, outerUsingDirectives));
             writer.WriteEmptyLines(Options.BlankLinesBetweenDeclarations);
         }
 
@@ -120,14 +120,14 @@ public abstract class SourceFileEmitterBase<TSpec> : ISourceFileGenerator<TSpec>
         // Emit the inner using directives if a namespace have been declared and if any are present.
         IReadOnlyList<string> targetInnerUsingDirectives = GetTargetInnerUsingDirectives(target).ToList();
         // review: should we enumerate targetOuterUsingDirectives multiple times with .Any() instead ?
-        //         not sure since Any() ain't optimized on netstandard2.0
+        //         not sure since I believe Any() ain't optimized on netstandard2.0
         if (Options.DefaultInnerUsingDirectives.Count > 0 || targetInnerUsingDirectives.Count > 0)
         {
             var innerUsingDirectives = GetDistinctUsingDirectives(
                 Options.DefaultInnerUsingDirectives
                     .Concat(targetInnerUsingDirectives));
 
-            writer.WriteLine(string.Join(Environment.NewLine, innerUsingDirectives));
+            writer.WriteLine(string.Join(NewLine, innerUsingDirectives));
             writer.WriteEmptyLines(Options.BlankLinesBetweenDeclarations);
         }
 

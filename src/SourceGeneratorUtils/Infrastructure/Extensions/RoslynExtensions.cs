@@ -5,7 +5,7 @@ namespace SourceGeneratorUtils;
 /// <summary>
 /// Provides extension methods to deal Roslyn types.
 /// </summary>
-public static class RoslynExtensions
+public static partial class RoslynExtensions
 {
     /// <summary>
     /// Gets the name of the given <paramref name="type"/> in a fully qualified style (including global alias).

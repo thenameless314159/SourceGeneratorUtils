@@ -158,7 +158,7 @@ public sealed class SourceWriter
             ReadOnlySpan<char> nextLine = GetNextLine(ref remaining, out isFinalLine);
 
             AddIndentation();
-            AppendSpan(_sb, nextLine);
+            _sb.AppendSpan( nextLine);
             _sb.AppendLine();
         }
         while (!isFinalLine);
@@ -228,13 +228,5 @@ public sealed class SourceWriter
         next = remainingText[..lineLength];
         remainingText = rest;
         return next;
-    }
-
-    private static unsafe void AppendSpan(StringBuilder builder, ReadOnlySpan<char> span)
-    {
-        fixed (char* ptr = span)
-        {
-            builder.Append(ptr, span.Length);
-        }
     }
 }

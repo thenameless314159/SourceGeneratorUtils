@@ -1,22 +1,26 @@
 <Project>
 
   <PropertyGroup>
-    <VersionPrefix>1.4.0</VersionPrefix>
     <!-- VersionSuffix used for local builds -->
     <VersionSuffix>dev</VersionSuffix>
     <!-- VersionSuffix to be used for CI builds -->
     <VersionSuffix Condition=" '$(ContinuousIntegrationBuild)' == 'true' And '$(BuildNumber)' != '' ">ci.$(BuildNumber)</VersionSuffix>
     <VersionSuffix Condition=" '$(ContinuousIntegrationBuild)' == 'true' And '$(IsNugetPackage)' == 'true' "></VersionSuffix>
     <IsPackable>true</IsPackable>
-    <DebugType>embedded</DebugType>
     <RepositoryType>git</RepositoryType>
     <Authors>thenameless314159</Authors>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <Copyright>Copyright © thenameless314159</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GitHubRepositoryName>SourceGeneratorUtils</GitHubRepositoryName>
     <RepositoryUrl>https://github.com/thenameless314159/SourceGeneratorUtils</RepositoryUrl>
     <PackageProjectUrl>https://github.com/thenameless314159/SourceGeneratorUtils</PackageProjectUrl>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PackageTags>src-gen sourcegen sourcegenerator sourcegeneration codegen codegenerator codegeneration helpers abstractions utils</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\README.md" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="$(MSBuildThisFileDirectory)..\LICENSE" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
 
 </Project>

@@ -25,7 +25,7 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
     public IEnumerable<SourceCodeEmitter<TSpec>> SourceCodeEmitters
     {
         get => _sourceCodeEmitters ?? Enumerable.Empty<SourceCodeEmitter<TSpec>>();
-        init => _sourceCodeEmitters = Options.InjectOptionsOnCodeEmitters            
+        init => _sourceCodeEmitters = Options.InjectOptionsOnCodeEmitters
             ? value
                 .Select(e => !e.HasOptionsSetup() ? e with { Options = Options } : e)
                 .ToArray()
@@ -54,7 +54,7 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
         {
             SourceCodeEmitter<TSpec> codeEmitter = codeEmitters[i];
 
-            copy[i] = !codeEmitter.HasOptionsSetup() 
+            copy[i] = !codeEmitter.HasOptionsSetup()
                 ? codeEmitter with { Options = options }
                 : codeEmitter;
         }
@@ -99,7 +99,7 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
         while (hasNext)
         {
             bool shouldAppendEmptyLines = false;
-            
+
             SourceCodeEmitter<TSpec> emitter = emitters.Current!;
             if (emitter.CanEmitTargetSourceCode(target))
             {
@@ -136,7 +136,7 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
             writer.WriteLine(specClasses[i]);
             writer.OpenBlock();
         }
-        
+
         // Gather the interfaces and base type to implement on the target class declaration.
         IReadOnlyList<string> targetInterfacesToImplement = GetTargetInterfacesToImplement(target).ToList();
         string? interfacesToImplement = Options.DefaultInterfaces.Count > 0 || targetInterfacesToImplement.Count > 0
@@ -148,7 +148,7 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
         string targetDeclaration = specClasses[0];
         Debug.Assert(!string.IsNullOrWhiteSpace(targetDeclaration));
 
-        int lastIndexOfNewLine = targetDeclaration.LastIndexOf(Environment.NewLine, StringComparison.InvariantCulture);
+        int lastIndexOfNewLine = targetDeclaration.LastIndexOf(NewLine, StringComparison.InvariantCulture);
         string? targetTypeDeclarationHeader = lastIndexOfNewLine != -1
             ? targetDeclaration[..lastIndexOfNewLine]
             : null;
@@ -163,14 +163,14 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
         {
             IEnumerable<string> attributes = Options.DefaultAttributes.Concat(targetAttributesToApply);
             string attributesToApply = !Options.UseCombinedAttributeDeclaration
-                ? string.Join(Environment.NewLine, attributes.Select(static a => $"[{a}]"))
+                ? string.Join(NewLine, attributes.Select(static a => $"[{a}]"))
                 : $"[{string.Join(", ", attributes)}]";
 
             writer.WriteLine(attributesToApply);
         }
-        
+
         string targetTypeDeclaration = lastIndexOfNewLine != -1
-            ? targetDeclaration[(lastIndexOfNewLine + Environment.NewLine.Length)..]
+            ? targetDeclaration[(lastIndexOfNewLine + NewLine.Length)..]
             : targetDeclaration;
 
         // The target doesn't have any declared base type
@@ -202,7 +202,7 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
     /// </summary>
     /// <param name="target">The target <typeparamref name="TSpec"/>.</param>
     /// <returns>A list of the additional outer using directives.</returns>
-    public override IEnumerable<string> GetTargetOuterUsingDirectives(TSpec target) 
+    public override IEnumerable<string> GetTargetOuterUsingDirectives(TSpec target)
         => SourceCodeEmitters.SelectMany(e => e.GetOuterUsingDirectives(target));
 
     /// <summary>
@@ -210,7 +210,7 @@ public abstract class SourceFileEmitter<TSpec> : SourceFileEmitterBase<TSpec> wh
     /// </summary>
     /// <param name="target">The target <typeparamref name="TSpec"/>.</param>
     /// <returns>A list of the additional inner using directives.</returns>
-    public override IEnumerable<string> GetTargetInnerUsingDirectives(TSpec target) 
+    public override IEnumerable<string> GetTargetInnerUsingDirectives(TSpec target)
         => SourceCodeEmitters.SelectMany(e => e.GetInnerUsingDirectives(target));
 
     /// <summary>
