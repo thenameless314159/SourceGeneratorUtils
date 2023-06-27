@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
 
 namespace SourceGeneratorUtils.Tests;
@@ -223,8 +222,7 @@ public class SourceFileEmitterTests
             ? typeDeclaration[(lastIndexOfNewLine + Environment.NewLine.Length)..]
             : typeDeclaration;
 
-        var expectedWriter = new SourceWriter();
-        expectedWriter.Indentation = indentCount;
+        var expectedWriter = new SourceWriter { Indentation = indentCount };
         if (typeDeclarationHeader != null)
         {
             expectedWriter.WriteLine(typeDeclarationHeader);
@@ -316,8 +314,6 @@ public class SourceFileEmitterTests
 
         return builder.ToString();
     }
-
-    private static string Indent(int count) => new(' ', count * 4);
 
     private sealed record TestGenerationSpec : AbstractTypeGenerationSpec
     {
