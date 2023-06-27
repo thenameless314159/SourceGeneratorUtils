@@ -9,7 +9,6 @@
     <IsPackable>true</IsPackable>
     <RepositoryType>git</RepositoryType>
     <Authors>thenameless314159</Authors>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Copyright>Copyright © thenameless314159</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
