@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 
 namespace SourceGeneratorUtils;
 
@@ -14,6 +15,13 @@ public static partial class RoslynExtensions
     /// <returns>The fully qualified type name.</returns>
     public static string GetFullyQualifiedAssemblyName(this ITypeSymbol type) 
         => type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+    /// <summary>
+    /// Creates a copy of the Location instance that does not capture a reference to Compilation.
+    /// </summary>
+    [return: NotNullIfNotNull(nameof(location))]
+    public static Location? GetTrimmedLocation(this Location? location)
+        => location is null ? null : Location.Create(location.SourceTree?.FilePath ?? "", location.SourceSpan, location.GetLineSpan().Span);
 
     /// <summary>
     /// Gets the <paramref name="accessibility"/> in a C# qualified style.

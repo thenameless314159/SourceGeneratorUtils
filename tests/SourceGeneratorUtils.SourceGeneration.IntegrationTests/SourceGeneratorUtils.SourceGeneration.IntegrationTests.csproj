@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <IsTestProject>true</IsTestProject>
@@ -15,10 +16,18 @@
     <PackageReference Include="xunit" Version="2.4.2" />
   </ItemGroup>
 
-  <ItemGroup> <!-- Integration tests in progress -->
-    <!-- <ProjectReference Include="..\..\gen\SourceGeneratorUtils.SourceGeneration.csproj" 
+  <ItemGroup>
+    <ProjectReference Include="..\..\gen\SourceGeneratorUtils.SourceGeneration.csproj" 
                       ReferenceOutputAssembly="false" 
-                      OutputItemType="Analyzer" /> -->
+                      OutputItemType="Analyzer" />
+  </ItemGroup>
+
+  <!-- 
+  Basically import the already written tests for the integration tests in order to test the generated code (again)
+  (why am I doing this ? because package references ain't supported in source generators yet)
+  -->
+  <ItemGroup>
+    <Compile Include="..\SourceGeneratorUtils.Tests\*.cs" />
   </ItemGroup>
 
 </Project>

@@ -2,6 +2,7 @@
 
 internal sealed record GenerationOptions
 {
-    public required bool MakePublicGeneratedTypesInternal { get; init; }
-    public required ImmutableEquatableArray<string> ExcludedTypes { get; init; }
+    public required bool MakeGeneratedTypesInternal { get; init; }
+    public required ImmutableEquatableArray<string> IncludeResources { get; init; }
+    public required ImmutableEquatableArray<string> ExcludeResources { get; init; }
 }

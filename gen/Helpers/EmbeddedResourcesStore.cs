@@ -41,8 +41,9 @@ internal static class EmbeddedResourcesStore
         const string resourceExtension = ".cs", genExtension = ".g.cs";
         int startIndex = resourceName switch // do not change the order of the switch arms, we need to check the deepest namespaces first
         {
-            _ when resourceName.StartsWith(DescriptorsNamespace) => DescriptorsNamespace.Length,
+            _ when resourceName.StartsWith(PolyfillsNamespace) => PolyfillsNamespace.Length,
             _ when resourceName.StartsWith(ExtensionsNamespace) => ExtensionsNamespace.Length,
+            _ when resourceName.StartsWith(DescriptorsNamespace) => DescriptorsNamespace.Length,
             _ when resourceName.StartsWith(InfrastructureNamespace) => InfrastructureNamespace.Length,
             _ when resourceName.StartsWith(LocalAssemblyNamespace) => LocalAssemblyNamespace.Length,
             _ => throw new ArgumentException($"The resource name '{resourceName}' does not start with the expected namespace '{LocalAssemblyNamespace}'.", nameof(resourceName))

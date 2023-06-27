@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using EnumHelper.SourceGenerator;
 using Microsoft.CodeAnalysis;
 using System.Reflection;
 
@@ -30,7 +29,8 @@ internal sealed partial class SourceGeneratorUtilsGenerator : IIncrementalGenera
         context.RegisterSourceOutput(sourceGenerationSpec, ReportDiagnosticsAndEmitSource);
     }
 
-    private void ReportDiagnosticsAndEmitSource(SourceProductionContext sourceProductionContext, (SourceGenerationSpec? SourceGenerationSpec, ImmutableEquatableArray<DiagnosticInfo> Diagnostics) input)
+    private void ReportDiagnosticsAndEmitSource(SourceProductionContext sourceProductionContext, 
+        (SourceGenerationSpec? SourceGenerationSpec, ImmutableEquatableArray<DiagnosticInfo> Diagnostics) input)
     {
         // Report any diagnostics ahead of emitting.
         foreach (DiagnosticInfo diagnostic in input.Diagnostics)

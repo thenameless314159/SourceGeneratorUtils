@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace EnumHelper.SourceGenerator;
+namespace SourceGeneratorUtils.SourceGeneration;
 
 /// <summary>
 /// Descriptor for diagnostic instances using structural equality comparison.

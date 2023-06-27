@@ -21,7 +21,10 @@ partial class SourceGeneratorUtilsGenerator
             {
                 try
                 {
-                    string resourceContent = GetEmbeddedResourceContent(resourceName, cacheResourceContent: true);
+                    string resourceContent = resourceName.Contains(nameof(System))
+                        ? GetEmbeddedResourceContent(resourceName, cacheResourceContent: true)
+                        : GetModifiedEmbeddedResourceContent(resourceName, sourceGenerationSpec.UseInternalTypes);
+
                     SourceText sourceText = SourceText.From(resourceContent, Encoding.UTF8);
                     _context.AddSource(FileNamesByResourceName[resourceName], sourceText);
                 }
@@ -35,6 +38,16 @@ partial class SourceGeneratorUtilsGenerator
                             resourceName));
                 }
             }
+        }
+
+        private static string GetModifiedEmbeddedResourceContent(string resourceName, bool useInternalTypes)
+        {
+            string resourceContent = GetEmbeddedResourceContent(resourceName, cacheResourceContent: false);
+            return $"""
+                {WellKnownStrings.SourceFileHeader}
+                
+                {(useInternalTypes ? resourceContent.Replace("public", "internal") : resourceContent)}
+                """;
         }
     }
 }

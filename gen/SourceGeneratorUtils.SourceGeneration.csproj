@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="..\src\SourceGeneratorUtils\Infrastructure\Polyfills\*.cs" Visible="false" />
     <Compile Include="..\src\SourceGeneratorUtils\Infrastructure\ImmutableEquatableArray.cs" Visible="false" />
+    <Compile Include="..\src\SourceGeneratorUtils\Infrastructure\Extensions\RoslynExtensions.cs" Visible="false" />
     <Compile Include="..\src\SourceGeneratorUtils\Infrastructure\Extensions\StringBuilderExtensions.cs" Visible="false" />
     <Compile Include="..\src\SourceGeneratorUtils\Infrastructure\Extensions\GetBestTypeByMetadataName.cs" Visible="false" />
   </ItemGroup>

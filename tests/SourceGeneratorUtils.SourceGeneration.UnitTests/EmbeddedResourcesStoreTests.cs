@@ -26,19 +26,21 @@ public class EmbeddedResourcesStoreTests
         }
     }
 
-    [Fact]
-    public void FileNamesByResourceName_ShouldMakeGeneratedFileName()
+    [Theory]
+    [MemberData(nameof(GetEmbeddedResourceNames))]
+    public void FileNamesByResourceName_ShouldMakeGeneratedFileName(string resourceName)
     {
         const string fileExtension = ".cs", genExtension = ".g.cs";
-
-        foreach (var (resourceName, fileName) in EmbeddedResourcesStore.FileNamesByResourceName)
-        {
-            DoesNotContain(WellKnownStrings.DescriptorsNamespace, fileName);
-            DoesNotContain(WellKnownStrings.ExtensionsNamespace, fileName);
-            DoesNotContain(WellKnownStrings.InfrastructureNamespace, fileName);
-            DoesNotContain(WellKnownStrings.LocalAssemblyNamespace, fileName);
-            Contains(fileExtension, resourceName);
-            Contains(genExtension, fileName);
-        }
+        True(EmbeddedResourcesStore.FileNamesByResourceName.TryGetValue(resourceName, out string? fileName));
+        DoesNotContain(WellKnownStrings.InfrastructureNamespace, fileName);
+        DoesNotContain(WellKnownStrings.LocalAssemblyNamespace, fileName);
+        DoesNotContain(WellKnownStrings.DescriptorsNamespace, fileName);
+        DoesNotContain(WellKnownStrings.ExtensionsNamespace, fileName);
+        DoesNotContain(WellKnownStrings.PolyfillsNamespace, fileName);
+        Contains(fileExtension, resourceName);
+        Contains(genExtension, fileName);
     }
+
+    public static IEnumerable<object[]> GetEmbeddedResourceNames()
+        => EmbeddedResourcesStore.FileNamesByResourceName.Keys.Select(static rn => new[] { rn });
 }
