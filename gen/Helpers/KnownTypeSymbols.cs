@@ -49,9 +49,9 @@ internal sealed class KnownTypeSymbols
         "System.Runtime.CompilerServices.IsExternalInit.g.cs" => IsExternalInitType is not null,
         "System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.g.cs" => NotNullWhenAttributeType is not null,
         "System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute.g.cs" => DoesNotReturnAttributeType is not null,
-        "System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute.g.cs" => NotNullIfNotNullAttributeType is not null,
         "System.Runtime.CompilerServices.RequiredMemberAttribute.g.cs" => RequiredMemberAttributeType is not null,
-        "System.Runtime.CompilerServices.SetsRequiredMembersAttribute.g.cs" => SetsRequiredMembersAttributeType is not null,
+        "System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute.g.cs" => NotNullIfNotNullAttributeType is not null,
+        "System.Diagnostics.CodeAnalysis.SetsRequiredMembersAttribute.g.cs" => SetsRequiredMembersAttributeType is not null,
         "System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.g.cs" => CompilerFeatureRequiredAttributeType is not null,
         _ => false
     };

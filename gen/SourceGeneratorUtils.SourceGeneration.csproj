@@ -31,10 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\src\SourceGeneratorUtils\**\*.cs" Visible="false">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-
+    <EmbeddedResource Include="..\src\SourceGeneratorUtils\**\*.cs" Visible="false" />
     <EmbeddedResource Remove="..\src\SourceGeneratorUtils\bin\**\*.cs" />
     <EmbeddedResource Remove="..\src\SourceGeneratorUtils\obj\**\*.cs" />
   </ItemGroup>
@@ -45,6 +42,7 @@
     <Compile Include="..\src\SourceGeneratorUtils\Infrastructure\Extensions\RoslynExtensions.cs" Visible="false" />
     <Compile Include="..\src\SourceGeneratorUtils\Infrastructure\Extensions\StringBuilderExtensions.cs" Visible="false" />
     <Compile Include="..\src\SourceGeneratorUtils\Infrastructure\Extensions\GetBestTypeByMetadataName.cs" Visible="false" />
+    <Compile Remove="..\src\SourceGeneratorUtils\Infrastructure\Polyfills\System.Runtime.SetsRequiredMembersAttribute.cs" />
   </ItemGroup>
 
 </Project>

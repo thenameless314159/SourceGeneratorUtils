@@ -50,40 +50,40 @@ partial class SourceGeneratorUtilsGenerator
 
             return new()
             {
-                TypesToGenerate = resourcesToInclude,
+                ResourcesToGenerate = resourcesToInclude,
                 UseInternalTypes = options.MakeGeneratedTypesInternal
             };
         }
 
         private IEnumerable<string> GetResourcesToInclude(GenerationOptions options)
         {
-            foreach (string resourceName in FileNamesByResourceName.Keys)
+            foreach (KeyValuePair<string, string> kvp in FileNamesByResourceName)
             {
                 // Skip resources that are excluded if they're not included.
-                if (IsResourceDefined(resourceName, options.ExcludeResources) &&
-                    !IsResourceDefined(resourceName, options.IncludeResources))
+                if (IsResourceDefined(kvp.Value, options.ExcludeResources) &&
+                    !IsResourceDefined(kvp.Value, options.IncludeResources))
                 {
                     continue;
                 }
 
                 // Skip already existing polyfills.
-                if (resourceName.Contains(nameof(System)) &&
-                    _knownSymbols.IsPolyfillDefined(FileNamesByResourceName[resourceName]))
+                if (kvp.Value.StartsWith(nameof(System)) &&
+                    _knownSymbols.IsPolyfillDefined(kvp.Value))
                 {
                     continue;
                 }
 
-                yield return resourceName;
+                yield return kvp.Key;
             }
             
-            static bool IsResourceDefined(string resourceName, ImmutableEquatableArray<string> resources)
+            static bool IsResourceDefined(string resourceFileName, ImmutableEquatableArray<string> resources)
             {
                 if (resources.Count == 0) return false;
                 if (resources[0] == "*") return true;
 
                 foreach (string resource in resources)
                 {
-                    if (resourceName == resource || resourceName.Contains(resource))
+                    if (resourceFileName.Contains(resource))
                     {
                         return true;
                     }

@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\gen\SourceGeneratorUtils.SourceGeneration.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\..\gen\SourceGeneratorUtils.SourceGeneration.csproj" />
   </ItemGroup>
 
 </Project>

@@ -20,6 +20,7 @@
   
   <ItemGroup>
     <InternalsVisibleTo Include="SourceGeneratorUtils.Tests" />
+    <Compile Remove=".\Infrastructure\Polyfills\System.Runtime.SetsRequiredMembersAttribute.cs" />
   </ItemGroup>
 
 </Project>

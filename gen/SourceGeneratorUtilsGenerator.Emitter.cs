@@ -17,7 +17,7 @@ partial class SourceGeneratorUtilsGenerator
 
         public void Emit(SourceGenerationSpec sourceGenerationSpec)
         {
-            foreach (string resourceName in sourceGenerationSpec.TypesToGenerate)
+            foreach (string resourceName in sourceGenerationSpec.ResourcesToGenerate)
             {
                 try
                 {

@@ -11,11 +11,7 @@ public class ExcludedPolyfillsTests
     [Theory]
     [MemberData(nameof(GetExcludedPolyfills))]
     public void PolyfillShouldNotBeGenerated(Type excludedPolyfill)
-        => NotEqual(excludedPolyfill.Assembly, _thisAssembly);
-
-    [Fact]
-    public void SetsRequiredPolyfillShouldBeGenerated()
-        => Equal(typeof(SetsRequiredMembersAttribute).Assembly, _thisAssembly);
+        => NotEqual(excludedPolyfill.Assembly.FullName, _thisAssembly.FullName);
 
     /// <summary>
     /// Returns the polyfills that should not be generated since already defined within the .NET7 runtime.
@@ -29,6 +25,7 @@ public class ExcludedPolyfillsTests
         yield return new object[] { typeof(DoesNotReturnAttribute) };
         yield return new object[] { typeof(RequiredMemberAttribute) };
         yield return new object[] { typeof(NotNullIfNotNullAttribute) };
+        yield return new object[] { typeof(SetsRequiredMembersAttribute) };
         yield return new object[] { typeof(CompilerFeatureRequiredAttribute) };
     }
 }
