@@ -38,7 +38,7 @@ public class SourceCodeEmitterTests
 
     private sealed record TestTypeGenerationSpec : AbstractTypeGenerationSpec
     {
-        public required int TestNumber { get; init; }
+        public required int TestNumber { get; set; }
     }
 
     private sealed record ThrowTypeSourceCodeEmitter : SourceCodeEmitter<TestTypeGenerationSpec>

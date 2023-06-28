@@ -7,7 +7,7 @@ namespace SourceGeneratorUtils.SourceGeneration;
 
 partial class SourceGeneratorUtilsGenerator
 {
-    public sealed class Parser
+    internal sealed class Parser
     {
         public static GenerationOptions ParseGenerationOptions(AnalyzerConfigOptionsProvider optionsProvider, CancellationToken _)
         {
@@ -33,11 +33,6 @@ partial class SourceGeneratorUtilsGenerator
 
         public List<DiagnosticInfo> Diagnostics { get; } = new();
 
-        private readonly KnownTypeSymbols _knownSymbols;
-
-        public Parser(KnownTypeSymbols knownSymbols) 
-            => _knownSymbols = knownSymbols;
-
         public SourceGenerationSpec? ParseSourceGenerationSpec(GenerationOptions options, CancellationToken _)
         {
             ImmutableEquatableArray<string> resourcesToInclude = GetResourcesToInclude(options).ToImmutableEquatableArray();
@@ -59,16 +54,12 @@ partial class SourceGeneratorUtilsGenerator
         {
             foreach (KeyValuePair<string, string> kvp in FileNamesByResourceName)
             {
-                // Skip resources that are excluded if they're not included.
-                if (IsResourceDefined(kvp.Value, options.ExcludeResources) &&
-                    !IsResourceDefined(kvp.Value, options.IncludeResources))
-                {
-                    continue;
-                }
+                bool isIncluded = IsResourceDefined(kvp.Key, options.IncludeResources);
+                bool isExcluded = IsResourceDefined(kvp.Key, options.ExcludeResources);
+                bool isPolyfill = kvp.Value.StartsWith(nameof(System));
 
-                // Skip already existing polyfills.
-                if (kvp.Value.StartsWith(nameof(System)) &&
-                    _knownSymbols.IsPolyfillDefined(kvp.Value))
+                // Exclude if it isn't included nor a required polyfill
+                if (isExcluded && !isIncluded && !isPolyfill)
                 {
                     continue;
                 }
@@ -76,14 +67,15 @@ partial class SourceGeneratorUtilsGenerator
                 yield return kvp.Key;
             }
             
-            static bool IsResourceDefined(string resourceFileName, ImmutableEquatableArray<string> resources)
+            static bool IsResourceDefined(string resourceName, ImmutableEquatableArray<string> resources)
             {
                 if (resources.Count == 0) return false;
                 if (resources[0] == "*") return true;
 
                 foreach (string resource in resources)
                 {
-                    if (resourceFileName.Contains(resource))
+                    // review: should check without this assembly namespace prefix and without the extension
+                    if (resource == resourceName || resourceName.Contains(resource))
                     {
                         return true;
                     }

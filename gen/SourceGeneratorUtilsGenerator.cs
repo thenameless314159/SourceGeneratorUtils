@@ -5,26 +5,26 @@ using System.Reflection;
 namespace SourceGeneratorUtils.SourceGeneration;
 
 [Generator(LanguageNames.CSharp)]
-internal sealed partial class SourceGeneratorUtilsGenerator : IIncrementalGenerator
+public sealed partial class SourceGeneratorUtilsGenerator : IIncrementalGenerator
 {
     public static readonly Assembly Assembly = typeof(SourceGeneratorUtilsGenerator).Assembly;
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        IncrementalValueProvider<KnownTypeSymbols> knownTypeSymbols = context.CompilationProvider.Select(static (compilation, _) => new KnownTypeSymbols(compilation));
+#if LAUNCH_DEBUGGER
+        System.Diagnostics.Debugger.Launch();
+#endif
         IncrementalValueProvider<GenerationOptions> options = context.AnalyzerConfigOptionsProvider.Select(Parser.ParseGenerationOptions);
 
-        IncrementalValueProvider<(SourceGenerationSpec?, ImmutableEquatableArray<DiagnosticInfo>)> sourceGenerationSpec = 
-            knownTypeSymbols
-                .Combine(options)
-                .Select(static (tuple, cancellationToken) =>
-                {
-                    Parser parser = new(tuple.Left);
-                    SourceGenerationSpec? sourceGenSpec = parser.ParseSourceGenerationSpec(tuple.Right, cancellationToken);
-                    ImmutableEquatableArray<DiagnosticInfo> diagnostics = parser.Diagnostics.ToImmutableEquatableArray();
-                    return (sourceGenSpec, diagnostics);
-                })
-                .WithTrackingName(nameof(SourceGenerationSpec));
+        IncrementalValueProvider<(SourceGenerationSpec?, ImmutableEquatableArray<DiagnosticInfo>)> sourceGenerationSpec = options
+            .Select(static (options, cancellationToken) => 
+            {
+                Parser parser = new();
+                SourceGenerationSpec? sourceGenSpec = parser.ParseSourceGenerationSpec(options, cancellationToken);
+                ImmutableEquatableArray<DiagnosticInfo> diagnostics = parser.Diagnostics.ToImmutableEquatableArray();
+                return (sourceGenSpec, diagnostics);
+            })
+            .WithTrackingName(nameof(SourceGenerationSpec));
 
         context.RegisterSourceOutput(sourceGenerationSpec, ReportDiagnosticsAndEmitSource);
     }

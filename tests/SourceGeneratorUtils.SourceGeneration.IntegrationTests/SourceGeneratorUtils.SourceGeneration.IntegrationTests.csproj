@@ -1,10 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFrameworks>$(NetCoreAppCurrent);$(NetCoreAppMinimum);$(NetFrameworkCurrent);$(NetFrameworkMinimum)</TargetFrameworks>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <IsHighAotMemoryUsageTest>true</IsHighAotMemoryUsageTest>
     <ImplicitUsings>enable</ImplicitUsings>
     <IsTestProject>true</IsTestProject>
+    <LangVersion>Latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -17,15 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\gen\SourceGeneratorUtils.SourceGeneration.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
-  </ItemGroup>
-
-  <!-- 
-  Basically import the already written tests for the integration tests in order to test the generated code (again)
-  (why am I doing this ? because package references ain't supported in source generators yet)
-  -->
-  <ItemGroup>
-    <Compile Include="..\SourceGeneratorUtils.Tests\*.cs" />
+    <ProjectReference Include="..\SourceGeneratorUtils.SourceGeneration.TestLibrary\SourceGeneratorUtils.SourceGeneration.TestLibrary.csproj" />
   </ItemGroup>
 
 </Project>

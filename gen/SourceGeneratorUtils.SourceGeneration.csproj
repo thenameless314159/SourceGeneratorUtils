@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="SourceGeneratorUtils.SourceGeneration.UnitTests" />
+    <InternalsVisibleTo Include="SourceGeneratorUtils.SourceGeneration.IntegrationTests" />
   </ItemGroup>
 
   <ItemGroup>

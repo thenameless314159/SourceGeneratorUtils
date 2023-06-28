@@ -2,12 +2,16 @@
 
 public class EmbeddedResourcesStoreTests
 {
+    [Fact] public void GetEmbeddedResourceContent_ThrowsOnInvalidResourceName()
+        => Throws<ArgumentException>(() => EmbeddedResourcesStore.GetEmbeddedResourceContent("invalid"));
+
     [Fact]
     public void GetEmbeddedResourceContent_ShouldReadResourceContentForAvailableResources()
     {
         foreach (string resourceName in EmbeddedResourcesStore.FileNamesByResourceName.Keys)
         {
             string resourceContent = EmbeddedResourcesStore.GetEmbeddedResourceContent(resourceName);
+            NotSame(EmbeddedResourcesStore.GetEmbeddedResourceContent(resourceName), resourceContent);
             False(string.IsNullOrWhiteSpace(resourceContent));
         }
     }
@@ -17,12 +21,9 @@ public class EmbeddedResourcesStoreTests
     {
         foreach (string resourceName in EmbeddedResourcesStore.FileNamesByResourceName.Keys)
         {
-            // Ensure the cache is empty before the test
-            False(EmbeddedResourcesStore.CachedEmbeddedResources.ContainsKey(resourceName));
-
             string resourceContent = EmbeddedResourcesStore.GetEmbeddedResourceContent(resourceName, cacheResourceContent: true);
             True(EmbeddedResourcesStore.CachedEmbeddedResources.TryGetValue(resourceName, out var cachedContent));
-            Equal(resourceContent, cachedContent);
+            Same(resourceContent, cachedContent);
         }
     }
 

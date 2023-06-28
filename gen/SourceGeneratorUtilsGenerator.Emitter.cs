@@ -8,7 +8,7 @@ namespace SourceGeneratorUtils.SourceGeneration;
 
 partial class SourceGeneratorUtilsGenerator
 {
-    public sealed class Emitter
+    internal sealed class Emitter
     {
         private readonly SourceProductionContext _context;
 

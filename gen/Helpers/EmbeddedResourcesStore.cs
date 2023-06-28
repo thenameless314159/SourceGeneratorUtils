@@ -38,7 +38,6 @@ internal static class EmbeddedResourcesStore
 
     private static string ResourceNameToFileName(string resourceName)
     {
-        const string resourceExtension = ".cs", genExtension = ".g.cs";
         int startIndex = resourceName switch // do not change the order of the switch arms, we need to check the deepest namespaces first
         {
             _ when resourceName.StartsWith(PolyfillsNamespace) => PolyfillsNamespace.Length,
@@ -52,10 +51,9 @@ internal static class EmbeddedResourcesStore
         ReadOnlySpan<char> fileName = resourceName.AsSpan(startIndex + 1); // +1 to skip the dot
         int lastIndexOfDot = fileName.LastIndexOf('.');
 
-        if (lastIndexOfDot == -1 || !fileName[lastIndexOfDot..].SequenceEqual(resourceExtension.AsSpan()))
-            throw new InvalidOperationException($"The resource name '{resourceName}' does not have the expected extension '{resourceExtension}'.");
-
-        fileName = fileName[..lastIndexOfDot]; // extract the file name without the extension
+        // extract the file name without the extension
+        fileName = fileName[..lastIndexOfDot]; 
+        const string genExtension = ".g.cs";
 
         int fileNameLength = fileName.Length + genExtension.Length;
         StringBuilder sb = new(fileNameLength, fileNameLength);
