@@ -12,9 +12,6 @@
 
     <!-- The minimum supported .NET version. -->
     <NetCoreAppMinimum>net6.0</NetCoreAppMinimum>
-
-    <NetFrameworkCurrent>net48</NetFrameworkCurrent>
-    <NetFrameworkMinimum>net462</NetFrameworkMinimum>
   </PropertyGroup>
 
 </Project>
