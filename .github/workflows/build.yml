@@ -23,9 +23,7 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: | 
-          4.6.2
-          4.8.x
+        dotnet-version: |
           6.0.x
           7.0.x
         
