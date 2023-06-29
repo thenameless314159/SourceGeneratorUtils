@@ -11,7 +11,7 @@ The main objective is to enable developers to dive straight into writing the cod
 # Installation
 In order to **import** the library in your [source generators](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview), some small tweaks are required. Full details can be found on [this repository's detailed documentation](https://thenameless314159.github.io/SourceGeneratorUtils/articles/install.html). Alternatively, you can also use the [source generator version](https://www.nuget.org/packages/SourceGeneratorUtils.SourceGeneration/) that'll emit the library as well as all the polyfills required to use it directly into your source generator project.
 
-## NuGet Releases [![NuGet Badge](https://buildstats.info/nuget/SourceGeneratorUtils.SourceGeneration)](https://www.nuget.org/packages/SourceGeneratorUtils/) [![NuGet Badge](https://buildstats.info/nuget/SourceGeneratorUtils.SourceGeneration)](https://www.nuget.org/packages/SourceGeneratorUtils.SourceGeneration/)
+## NuGet Releases [![NuGet Badge](https://buildstats.info/nuget/SourceGeneratorUtils)](https://www.nuget.org/packages/SourceGeneratorUtils/) [![NuGet Badge](https://buildstats.info/nuget/SourceGeneratorUtils.SourceGeneration)](https://www.nuget.org/packages/SourceGeneratorUtils.SourceGeneration/)
 
 Two packages can be found on [nuget.org](https://www.nuget.org/packages/SourceGeneratorUtils):
 
