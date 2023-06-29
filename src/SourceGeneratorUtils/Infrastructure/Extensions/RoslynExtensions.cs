@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace SourceGeneratorUtils;
 
@@ -8,6 +9,14 @@ namespace SourceGeneratorUtils;
 /// </summary>
 public static partial class RoslynExtensions
 {
+    /// <summary>
+    /// Returns the <see cref="LanguageVersion"/> for the given <paramref name="compilation"/> if it is assignable to <see cref="CSharpCompilation"/>.
+    /// </summary>
+    /// <param name="compilation">The compilation.</param>
+    /// <returns>The language version.</returns>
+    public static LanguageVersion? GetLanguageVersion(this Compilation compilation)
+        => compilation is CSharpCompilation csc ? csc.LanguageVersion : null;
+
     /// <summary>
     /// Gets the name of the given <paramref name="type"/> in a fully qualified style (including global alias).
     /// </summary>

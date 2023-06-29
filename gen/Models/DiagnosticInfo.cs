@@ -6,7 +6,7 @@ namespace SourceGeneratorUtils.SourceGeneration;
 /// Descriptor for diagnostic instances using structural equality comparison.
 /// Provides a work-around for https://github.com/dotnet/roslyn/issues/68291.
 /// </summary>
-internal readonly struct DiagnosticInfo : IEquatable<DiagnosticInfo>
+public readonly struct DiagnosticInfo : IEquatable<DiagnosticInfo>
 {
     public required DiagnosticDescriptor Descriptor { get; init; }
     public required object?[] MessageArgs { get; init; }

@@ -10,8 +10,8 @@ public static class SourceGeneratorUtilsGeneratorIncrementalTests
     [MemberData(nameof(GetCompilationHelperFactories))]
     public static void CompilingTheSameSourceResultsInEqualModels(Func<Compilation> factory)
     {
-        SourceGeneratorResult result1 = CompilationHelper.RunSourceGenerator(factory());
-        SourceGeneratorResult result2 = CompilationHelper.RunSourceGenerator(factory());
+        SourceGeneratorResult result1 = RunSourceGenerator(factory());
+        SourceGeneratorResult result2 = RunSourceGenerator(factory());
 
         Equal(result1.SourceGenerationSpecs.Length, result2.SourceGenerationSpecs.Length);
 
@@ -32,7 +32,7 @@ public static class SourceGeneratorUtilsGeneratorIncrementalTests
     [MemberData(nameof(GetCompilationHelperFactories))]
     public static void SourceGenModelDoesNotEncapsulateSymbolsOrCompilationData(Func<Compilation> factory)
     {
-        var result = CompilationHelper.RunSourceGenerator(factory());
+        var result = RunSourceGenerator(factory());
         WalkObjectGraph(result.SourceGenerationSpecs);
 
         static void WalkObjectGraph(object obj)

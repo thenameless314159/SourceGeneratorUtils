@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>$(NetCoreAppCurrent);$(NetCoreAppMinimum)</TargetFrameworks>
@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SourceGeneratorUtils\SourceGeneratorUtils.csproj" />
+    <ProjectReference Include="..\..\src\SourceGeneratorUtils\SourceGeneratorUtils.csproj"  />
   </ItemGroup>
 
 </Project>

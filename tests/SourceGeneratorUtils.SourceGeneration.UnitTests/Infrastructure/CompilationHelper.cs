@@ -8,13 +8,23 @@ namespace SourceGeneratorUtils.SourceGeneration.UnitTests;
 public static class CompilationHelper
 {
     private static readonly GeneratorDriverOptions _generatorDriverOptions = new(disabledOutputs: IncrementalGeneratorOutputKind.None, trackIncrementalGeneratorSteps: true);
-    private static readonly CSharpParseOptions _parseOptions = new(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+    private static readonly CSharpCompilationOptions _compileOptions = new(OutputKind.DynamicallyLinkedLibrary);
+    private static readonly CSharpParseOptions _parseOptions = CreateParseOptions();
+
+    public static CSharpParseOptions CreateParseOptions(LanguageVersion? version = null, DocumentationMode? documentationMode = null)
+    {
+        return new CSharpParseOptions(
+            kind: SourceCodeKind.Regular,
+            languageVersion: version ?? LanguageVersion.CSharp10, // C# 10 is the minimum supported lang version by the source generator.
+            documentationMode: documentationMode ?? DocumentationMode.Parse);
+    }
 
     public static Compilation CreateCompilation(
         string source,
         string assemblyName = "TestAssembly",
         MetadataReference[]? additionalReferences = null,
-        Func<CSharpParseOptions, CSharpParseOptions>? configureParseOptions = null)
+        Func<CSharpParseOptions, CSharpParseOptions>? configureParseOptions = null,
+        Func<CSharpCompilationOptions, CSharpCompilationOptions>? configureCompileOptions = null)
     {
         List<MetadataReference> references = new()
         {
@@ -31,29 +41,39 @@ public static class CompilationHelper
         }
 
         var parseOptions = configureParseOptions?.Invoke(_parseOptions) ?? _parseOptions;
-        return CSharpCompilation.Create(
-            assemblyName,
+        var compileOptions = configureCompileOptions?.Invoke(_compileOptions) ?? _compileOptions;
+
+        return CSharpCompilation.Create(assemblyName,
+            options: compileOptions,
             references: references.ToArray(),
-            syntaxTrees: new[] { CSharpSyntaxTree.ParseText(source, parseOptions) },
-            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+            syntaxTrees: new[] { CSharpSyntaxTree.ParseText(source, parseOptions) }
         );
     }
 
-    public static CSharpGeneratorDriver CreateSourceGeneratorDriver(SourceGeneratorUtilsGenerator? generator = null)
+    public static CSharpGeneratorDriver CreateSourceGeneratorDriver(
+        Compilation compilation, 
+        SourceGeneratorUtilsGenerator? generator = null, 
+        Dictionary<string, string>? buildProperties = null)
     {
         generator ??= new();
+        CSharpParseOptions parseOptions = compilation.SyntaxTrees
+            .OfType<CSharpSyntaxTree>()
+            .Select(tree => tree.Options)
+            .FirstOrDefault() ?? _parseOptions;
+
         return CSharpGeneratorDriver.Create(
+            optionsProvider: buildProperties is null ? null : new TestAnalyzerConfigOptionsProvider(buildProperties),
             generators: new[] { generator.AsSourceGenerator() },
             driverOptions: _generatorDriverOptions, 
-            parseOptions: _parseOptions);
+            parseOptions: parseOptions);
     }
 
-    public static SourceGeneratorResult RunSourceGenerator(Compilation compilation)
+    public static SourceGeneratorResult RunSourceGenerator(Compilation compilation, Dictionary<string, string>? buildProperties = null)
     {
         ImmutableArray<SourceGenerationSpec> generatedSpecs = ImmutableArray<SourceGenerationSpec>.Empty;
         SourceGeneratorUtilsGenerator generator = new() { OnSourceEmitting = specs => generatedSpecs = specs };
 
-        CSharpGeneratorDriver driver = CreateSourceGeneratorDriver(generator);
+        CSharpGeneratorDriver driver = CreateSourceGeneratorDriver(compilation, generator, buildProperties);
         driver.RunGeneratorsAndUpdateCompilation(compilation, out Compilation outCompilation, out ImmutableArray<Diagnostic> diagnostics);
 
         return new()
@@ -64,13 +84,8 @@ public static class CompilationHelper
         };
     }
 
-    /// <summary>
-    /// Create a default compilation for testing that uses one of the available emitted source.
-    /// </summary>
-    /// <returns>The compilation.</returns>
-    public static Compilation CreateDefaultCompilation()
-    {
-        const string source = """
+    // use the same source for most tests since we're not parsing any syntax trees
+    public const string DefaultSource = """
             using SourceGeneratorUtils;
             
             namespace Test
@@ -79,7 +94,7 @@ public static class CompilationHelper
                 {
                     public static string TestMethod()
                     {
-                        SourceWriter writer = new();
+                        SourceWriter writer = new SourceWriter();
                         writer.WriteLine("Hello, World!");
                         return writer.ToString();
                     }
@@ -87,6 +102,9 @@ public static class CompilationHelper
             }
             """;
 
-        return CreateCompilation(source);
-    }
+    /// <summary>
+    /// Create a default compilation for testing that uses one of the available emitted source.
+    /// </summary>
+    /// <returns>The compilation.</returns>
+    public static Compilation CreateDefaultCompilation() => CreateCompilation(DefaultSource);
 }

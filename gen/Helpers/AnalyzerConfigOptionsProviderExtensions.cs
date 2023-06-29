@@ -3,14 +3,14 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace SourceGeneratorUtils.SourceGeneration;
 
-internal static class AnalyzerConfigOptionsProviderExtensions
+public static class AnalyzerConfigOptionsProviderExtensions
 {
     public static bool TryGetGlobalOptionsValue(this AnalyzerConfigOptionsProvider optionsProvider, string propertyName, 
         out bool propertyValue)
     {
         if (optionsProvider.GlobalOptions.TryGetValue(propertyName, out string? msBuildProperty))
         {
-            propertyValue = string.Equals(msBuildProperty, bool.TrueString, StringComparison.InvariantCulture);
+            propertyValue = string.Equals(msBuildProperty, bool.TrueString, StringComparison.OrdinalIgnoreCase);
             return true;
         }
 

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SourceGeneratorUtils.SourceGeneration;
 
-internal static class EmbeddedResourcesStore
+public static class EmbeddedResourcesStore
 {
     public static readonly IReadOnlyDictionary<string, string> FileNamesByResourceName = SourceGeneratorUtilsGenerator.Assembly
         .GetManifestResourceNames()
@@ -36,7 +36,7 @@ internal static class EmbeddedResourcesStore
         }
     }
 
-    private static string ResourceNameToFileName(string resourceName)
+    public static string ResourceNameToFileName(string resourceName)
     {
         int startIndex = resourceName switch // do not change the order of the switch arms, we need to check the deepest namespaces first
         {

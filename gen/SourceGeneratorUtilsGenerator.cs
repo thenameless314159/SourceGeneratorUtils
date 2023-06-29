@@ -14,13 +14,15 @@ public sealed partial class SourceGeneratorUtilsGenerator : IIncrementalGenerato
 #if LAUNCH_DEBUGGER
         System.Diagnostics.Debugger.Launch();
 #endif
+        IncrementalValueProvider<KnownTypeSymbols> knownTypeSymbols = context.CompilationProvider.Select(static (c, _) => new KnownTypeSymbols(c));
         IncrementalValueProvider<GenerationOptions> options = context.AnalyzerConfigOptionsProvider.Select(Parser.ParseGenerationOptions);
 
-        IncrementalValueProvider<(SourceGenerationSpec?, ImmutableEquatableArray<DiagnosticInfo>)> sourceGenerationSpec = options
-            .Select(static (options, cancellationToken) => 
+        IncrementalValueProvider<(SourceGenerationSpec?, ImmutableEquatableArray<DiagnosticInfo>)> sourceGenerationSpec = knownTypeSymbols
+            .Combine(options)
+            .Select(static (tuple, _) => 
             {
-                Parser parser = new();
-                SourceGenerationSpec? sourceGenSpec = parser.ParseSourceGenerationSpec(options, cancellationToken);
+                Parser parser = new(tuple.Left);
+                SourceGenerationSpec? sourceGenSpec = parser.ParseSourceGenerationSpec(tuple.Right);
                 ImmutableEquatableArray<DiagnosticInfo> diagnostics = parser.Diagnostics.ToImmutableEquatableArray();
                 return (sourceGenSpec, diagnostics);
             })

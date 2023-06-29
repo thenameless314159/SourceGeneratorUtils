@@ -22,11 +22,6 @@
   <Import Project="..\src\Directory.Build.props" />
 
   <ItemGroup>
-    <InternalsVisibleTo Include="SourceGeneratorUtils.SourceGeneration.UnitTests" />
-    <InternalsVisibleTo Include="SourceGeneratorUtils.SourceGeneration.IntegrationTests" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" PrivateAssets="all" />
   </ItemGroup>

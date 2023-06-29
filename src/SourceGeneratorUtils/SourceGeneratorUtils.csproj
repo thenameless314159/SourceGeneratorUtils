@@ -22,4 +22,8 @@
     <InternalsVisibleTo Include="SourceGeneratorUtils.Tests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Condition="'$(TargetFramework)'!='netstandard2.0'" Remove=".\Infrastructure\Polyfills\*.cs" />
+  </ItemGroup>
+
 </Project>

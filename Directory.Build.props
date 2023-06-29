@@ -7,11 +7,14 @@
   <!-- The TFMs to build and test against. -->
   <PropertyGroup>
     <NetCoreAppCurrentVersion>7.0</NetCoreAppCurrentVersion>
-    <NetCoreAppCurrentIdentifier>.NETCoreApp</NetCoreAppCurrentIdentifier>
     <NetCoreAppCurrent>net$(NetCoreAppCurrentVersion)</NetCoreAppCurrent>
-
+    
     <!-- The minimum supported .NET version. -->
-    <NetCoreAppMinimum>net6.0</NetCoreAppMinimum>
+    <NetCoreAppPreviousVersion>6.0</NetCoreAppPreviousVersion>
+    <NetCoreAppMinimum>net$(NetCoreAppPreviousVersion)</NetCoreAppMinimum>
+
+    <NetFrameworkMinimum>net462</NetFrameworkMinimum>
+    <NetFrameworkCurrent>net48</NetFrameworkCurrent>
   </PropertyGroup>
 
 </Project>

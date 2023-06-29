@@ -2,8 +2,15 @@
 
 public class EmbeddedResourcesStoreTests
 {
+    [Fact] public void ResourceNameToFileName_ThrowsOnInvalidResourceNamePrefix()
+        => Throws<ArgumentException>(() => EmbeddedResourcesStore.ResourceNameToFileName("invalid"));
+
     [Fact] public void GetEmbeddedResourceContent_ThrowsOnInvalidResourceName()
         => Throws<ArgumentException>(() => EmbeddedResourcesStore.GetEmbeddedResourceContent("invalid"));
+
+    [Fact]
+    public void ResourceNameToFileName_ReturnsFileNameWithNoPrefix()
+        => Equal("MyResource.g.cs", EmbeddedResourcesStore.ResourceNameToFileName("SourceGeneratorUtils.SourceGeneration.MyResource.cs"));
 
     [Fact]
     public void GetEmbeddedResourceContent_ShouldReadResourceContentForAvailableResources()
