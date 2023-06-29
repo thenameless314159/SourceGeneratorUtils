@@ -55,7 +55,7 @@ jobs:
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"thenameless314159_SourceGeneratorUtils" /o:"thenameless314159" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
           dotnet restore SourceGeneratorUtils.sln
           dotnet build SourceGeneratorUtils.sln --no-restore --configuration Release
-          dotnet test tests/SourceGeneratorUtils.Tests/SourceGeneratorUtils.Tests.csproj `
+          dotnet test SourceGeneratorUtils.sln --no-build --no-restore `
           --collect:"XPlat Code Coverage" `
           --results-directory TestResults/ `
           --logger "trx;LogFileName=unittests.trx" `

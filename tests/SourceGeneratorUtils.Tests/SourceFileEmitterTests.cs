@@ -137,7 +137,11 @@ public class SourceFileEmitterTests
         var emitter = new TestSourceFileEmitter(options, sourceCodeEmitters);
 
         IEnumerable<string> expected = sourceCodeEmitters.SelectMany(e => e.AttributesToApply)
+#if NET462
+            .Concat(new[] { $"global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"{_localAssemblyName.Name}\", \"{_localAssemblyName.Version}\")" });
+#else
             .Append($"global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"{_localAssemblyName.Name}\", \"{_localAssemblyName.Version}\")");
+#endif
 
         Equal(expected, emitter.GetTargetAttributesToApply(DefaultSpec));
     }
@@ -335,7 +339,6 @@ public class SourceFileEmitterTests
         public IReadOnlyList<string> InnerUsingDirectives { get; init; } = Array.Empty<string>();
         public IReadOnlyList<string> AttributesToApply { get; init; } = Array.Empty<string>();
         public IReadOnlyList<string> InterfacesToImplement { get; init; } = Array.Empty<string>();
-
 
         public override void EmitTargetSourceCode(TestGenerationSpec target, SourceWriter writer)
         {

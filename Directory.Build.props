@@ -4,4 +4,17 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <!-- The TFMs to build and test against. -->
+  <PropertyGroup>
+    <NetCoreAppCurrentVersion>7.0</NetCoreAppCurrentVersion>
+    <NetCoreAppCurrent>net$(NetCoreAppCurrentVersion)</NetCoreAppCurrent>
+    
+    <!-- The minimum supported .NET version. -->
+    <NetCoreAppPreviousVersion>6.0</NetCoreAppPreviousVersion>
+    <NetCoreAppMinimum>net$(NetCoreAppPreviousVersion)</NetCoreAppMinimum>
+
+    <NetFrameworkMinimum>net462</NetFrameworkMinimum>
+    <NetFrameworkCurrent>net48</NetFrameworkCurrent>
+  </PropertyGroup>
+
 </Project>

@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>$(NetCoreAppCurrent);$(NetCoreAppMinimum)</TargetFrameworks>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <IsHighAotMemoryUsageTest>true</IsHighAotMemoryUsageTest>
+    <TargetFramework>$(NetCoreAppCurrent)</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <IsTestProject>true</IsTestProject>
     <LangVersion>Latest</LangVersion>
@@ -17,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SourceGeneratorUtils\SourceGeneratorUtils.csproj"  />
+    <ProjectReference Include="..\..\gen\SourceGeneratorUtils.SourceGeneration.csproj" TargetFramework="netstandard2.0" />
   </ItemGroup>
 
 </Project>

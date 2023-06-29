@@ -156,10 +156,20 @@ public class SourceBuilderTests
         True(File.Exists(Path.Combine(directory.FullName, file1)));
         True(File.Exists(Path.Combine(directory.FullName, file2)));
 
-        var file1Content = await File.ReadAllTextAsync(Path.Combine(directory.FullName, file1));
+        var file1Content =
+#if NET6_0_OR_GREATER
+            await File.ReadAllTextAsync(Path.Combine(directory.FullName, file1));
+#else
+            File.ReadAllText(Path.Combine(directory.FullName, file1));
+#endif
         Equal(_testSourceFiles[file1].ToString(), file1Content);
 
-        var file2Content = await File.ReadAllTextAsync(Path.Combine(directory.FullName, file2));
+        var file2Content =
+#if NET6_0_OR_GREATER
+            await File.ReadAllTextAsync(Path.Combine(directory.FullName, file2));
+#else
+            File.ReadAllText(Path.Combine(directory.FullName, file2));
+#endif
         Equal(_testSourceFiles[file2].ToString(), file2Content);
 
         directory.Refresh();

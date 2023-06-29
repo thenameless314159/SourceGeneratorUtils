@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>$(NetCoreAppCurrent);$(NetCoreAppMinimum)</TargetFrameworks>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <IsHighAotMemoryUsageTest>true</IsHighAotMemoryUsageTest>
     <ImplicitUsings>enable</ImplicitUsings>
     <IsTestProject>true</IsTestProject>
     <LangVersion>Latest</LangVersion>
@@ -17,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SourceGeneratorUtils\SourceGeneratorUtils.csproj"  />
+    <ProjectReference Include="..\SourceGeneratorUtils.SourceGeneration.TestLibrary\SourceGeneratorUtils.SourceGeneration.TestLibrary.csproj" />
   </ItemGroup>
 
 </Project>
