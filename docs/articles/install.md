@@ -19,12 +19,18 @@ To properly set up a NuGet package **within a source generator assembly**, regar
 
 By following these steps, you can properly set up any NuGet package within a source generator assembly, regardless of its registry (given that you replace the assembly name and version with your own). These modifications ensure that the package's dependencies are handled correctly within the source generator.
 
-## NuGet Releases [![NuGet Badge](https://buildstats.info/nuget/SourceGeneratorUtils)](https://www.nuget.org/packages/SourceGeneratorUtils/)
+Alternatively, you could also use the [source generator version](https://www.nuget.org/packages/SourceGeneratorUtils.SourceGeneration/) that'll emit the library as well as all the polyfills required to use it directly into your source generator project.
 
-This package can be found on [nuget.org](https://www.nuget.org/packages/SourceGeneratorUtils):
+## NuGet Releases [![NuGet Badge](https://buildstats.info/nuget/SourceGeneratorUtils)](https://www.nuget.org/packages/SourceGeneratorUtils/) [![NuGet Badge](https://buildstats.info/nuget/SourceGeneratorUtils)](https://www.nuget.org/packages/SourceGeneratorUtils.SourceGeneration/)
+
+Two packages can be found on [nuget.org](https://www.nuget.org/packages/SourceGeneratorUtils):
 
 ``` console
 > dotnet add package SourceGeneratorUtils
+```
+
+``` console
+> dotnet add package SourceGeneratorUtils.SourceGeneration
 ```
 
 ## CI Builds [![CI status](https://github.com/thenameless314159/SourceGeneratorUtils/actions/workflows/ci.yml/badge.svg)](https://github.com/thenameless314159/SourceGeneratorUtils/actions/workflows/ci.yml)

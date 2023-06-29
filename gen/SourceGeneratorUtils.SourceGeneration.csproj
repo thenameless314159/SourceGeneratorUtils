@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Description>The source generated version of the SourceGeneratorUtils library.</Description>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -8,8 +9,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <EnableDefaultItems>true</EnableDefaultItems>
-    <IsRoslynComponent>true</IsRoslynComponent>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsRoslynComponent>true</IsRoslynComponent>
     <AnalyzerLanguage>cs</AnalyzerLanguage>
     <ImplicitUsings>enable</ImplicitUsings>
     <UsingToolXliff>true</UsingToolXliff>
@@ -20,6 +21,10 @@
   </PropertyGroup>
 
   <Import Project="..\src\Directory.Build.props" />
+
+  <PropertyGroup>
+    <DefineConstants Condition="'$(LaunchDebugger)' == 'true'">$(DefineConstants);LAUNCH_DEBUGGER</DefineConstants>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
@@ -39,6 +44,11 @@
     <Compile Include="..\src\SourceGeneratorUtils\Infrastructure\Extensions\StringBuilderExtensions.cs" Visible="false" />
     <Compile Include="..\src\SourceGeneratorUtils\Infrastructure\Extensions\GetBestTypeByMetadataName.cs" Visible="false" />
     <Compile Remove="..\src\SourceGeneratorUtils\Infrastructure\Polyfills\System.Runtime.SetsRequiredMembersAttribute.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Package the generator in the analyzer directory of the nuget package -->
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 
 </Project>
