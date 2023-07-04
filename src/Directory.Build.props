@@ -11,7 +11,7 @@
     <Authors>thenameless314159</Authors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Copyright>Copyright © thenameless314159</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <GitHubRepositoryName>SourceGeneratorUtils</GitHubRepositoryName>
     <RepositoryUrl>https://github.com/thenameless314159/SourceGeneratorUtils</RepositoryUrl>
     <PackageProjectUrl>https://github.com/thenameless314159/SourceGeneratorUtils</PackageProjectUrl>

@@ -14,7 +14,7 @@
     <AnalyzerLanguage>cs</AnalyzerLanguage>
     <ImplicitUsings>enable</ImplicitUsings>
     <UsingToolXliff>true</UsingToolXliff>
-    <VersionPrefix>0.0.1</VersionPrefix>
+    <VersionPrefix>0.0.2</VersionPrefix>
     <LangVersion>Latest</LangVersion>
     <PackSymbols>false</PackSymbols>
     <Nullable>enable</Nullable>
